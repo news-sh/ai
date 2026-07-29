@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="news — AI chat with Firebase progress sync" />
+  <title>news</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #05060a;
+      --glass: rgba(255, 255, 255, 0.045);
+      --glass-strong: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.18);
+      --accent: #7c9cff;
+      --accent-soft: rgba(124, 156, 255, 0.25);
+      --accent-glow: rgba(124, 156, 255, 0.45);
+      --text: #e8eaef;
+      --text-muted: #8b90a0;
+      --danger: #f87171;
+      --radius: 20px;
+      --blur: 24px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; font-family: var(--font); background: var(--bg-deep); color: var(--text);
+      overflow: hidden; -webkit-font-smoothing: antialiased;
+    }
+    .scene {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(80, 100, 220, 0.18), transparent 50%),
+        radial-gradient(ellipse 70% 50% at 85% 20%, rgba(120, 60, 200, 0.12), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 50% 90%, rgba(40, 160, 180, 0.1), transparent 50%),
+        var(--bg-deep);
+    }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55;
+      animation: float 18s ease-in-out infinite; will-change: transform;
+    }
+    .blob-1 { width: 42vw; height: 42vw; max-width: 520px; max-height: 520px; background: #4f6ef7; top: -10%; left: -8%; }
+    .blob-2 { width: 36vw; height: 36vw; max-width: 440px; max-height: 440px; background: #8b5cf6; top: 20%; right: -12%; animation-delay: -6s; animation-duration: 22s; }
+    .blob-3 { width: 48vw; height: 48vw; max-width: 580px; max-height: 580px; background: #0ea5a8; bottom: -18%; left: 25%; animation-delay: -12s; animation-duration: 26s; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(4%, 6%) scale(1.05); }
+      66% { transform: translate(-5%, 3%) scale(0.97); }
+    }
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur)) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 rgba(0,0,0,0.2);
+    }
+    .glass-strong {
+      background: var(--glass-strong);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #app {
+      position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column;
+      max-width: 1100px; margin: 0 auto; padding: 16px; gap: 12px;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; flex-shrink: 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: grid; place-items: center; box-shadow: 0 0 20px var(--accent-glow); font-size: 18px;
+    }
+    .brand h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; }
+    .brand span { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; display: block; margin-top: 1px; }
+    .user-area { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: grid; place-items: center; font-size: 0.75rem; font-weight: 600;
+      border: 1px solid var(--glass-border);
+    }
+    .btn {
+      appearance: none; border: 1px solid var(--glass-border); background: var(--glass);
+      color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 500;
+      padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(12px); display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { background: var(--glass-strong); border-color: var(--glass-highlight); box-shadow: 0 0 16px var(--accent-soft); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(124,156,255,0.35), rgba(167,139,250,0.3));
+      border-color: rgba(124,156,255,0.45);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(124,156,255,0.5), rgba(167,139,250,0.4));
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { color: var(--text); background: var(--glass); }
+    .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 10px; justify-content: center; }
+    .main { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+    .chat-panel { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 0; }
+    .messages {
+      flex: 1; overflow-y: auto; padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
+    }
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+    .msg { max-width: 85%; animation: msgIn 0.35s ease; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .msg.user { align-self: flex-end; }
+    .msg.assistant { align-self: flex-start; }
+    .msg-bubble {
+      padding: 12px 16px; border-radius: 16px; line-height: 1.55; font-size: 0.925rem;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .msg.user .msg-bubble {
+      background: linear-gradient(135deg, rgba(124,156,255,0.28), rgba(167,139,250,0.22));
+      border: 1px solid rgba(124,156,255,0.35); border-bottom-right-radius: 4px;
+    }
+    .msg.assistant .msg-bubble {
+      background: var(--glass-strong); border: 1px solid var(--glass-border);
+      border-bottom-left-radius: 4px; backdrop-filter: blur(16px);
+    }
+    .msg-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; padding: 0 4px; }
+    .msg.user .msg-meta { text-align: right; }
+    .msg-bubble code {
+      font-family: var(--mono); font-size: 0.82em; background: rgba(0,0,0,0.35);
+      padding: 1px 5px; border-radius: 4px;
+    }
+    .msg-bubble pre {
+      font-family: var(--mono); font-size: 0.8rem; background: rgba(0,0,0,0.4);
+      padding: 12px; border-radius: 10px; overflow-x: auto; margin: 8px 0;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .typing { display: flex; gap: 5px; padding: 14px 18px; align-self: flex-start; }
+    .typing span {
+      width: 7px; height: 7px; background: var(--accent); border-radius: 50%;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .empty {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; text-align: center; padding: 40px 20px; color: var(--text-muted);
+    }
+    .empty-icon {
+      width: 64px; height: 64px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(124,156,255,0.2), rgba(167,139,250,0.15));
+      border: 1px solid var(--glass-border); display: grid; place-items: center;
+      font-size: 28px; margin-bottom: 8px; box-shadow: 0 0 40px var(--accent-soft);
+    }
+    .empty h2 { font-size: 1.25rem; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+    .empty p { font-size: 0.9rem; max-width: 320px; line-height: 1.5; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; max-width: 480px; }
+    .suggestion {
+      padding: 8px 14px; font-size: 0.8rem; border-radius: 999px; background: var(--glass);
+      border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+    }
+    .suggestion:hover { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+    .input-bar {
+      padding: 12px 14px; display: flex; gap: 10px; align-items: flex-end;
+      flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .input-wrap { flex: 1; position: relative; }
+    #userInput {
+      width: 100%; min-height: 48px; max-height: 140px; padding: 12px 16px; border-radius: 14px;
+      border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: var(--text);
+      font-family: inherit; font-size: 0.925rem; line-height: 1.45; resize: none; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #userInput:focus { border-color: rgba(124,156,255,0.5); box-shadow: 0 0 0 3px var(--accent-soft); }
+    #userInput::placeholder { color: var(--text-muted); }
+    .send-btn {
+      width: 48px; height: 48px; border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #7c9cff, #a78bfa); color: #fff; cursor: pointer;
+      display: grid; place-items: center; flex-shrink: 0; transition: all 0.2s;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .send-btn:hover { transform: scale(1.04); box-shadow: 0 6px 24px var(--accent-glow); }
+    .send-btn:active { transform: scale(0.96); }
+    .send-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .send-btn svg { width: 20px; height: 20px; }
+    .overlay {
+      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(5,6,10,0.65); backdrop-filter: blur(12px);
+    }
+    .overlay.hidden { display: none; }
+    .auth-card { width: 100%; max-width: 400px; padding: 32px 28px; text-align: center; }
+    .auth-card h2 { font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .auth-card .sub { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px; }
+    .auth-tabs {
+      display: flex; gap: 4px; background: rgba(0,0,0,0.25); border-radius: 12px; padding: 4px; margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1; padding: 8px; border: none; background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.85rem; font-weight: 500; border-radius: 9px; cursor: pointer; transition: all 0.2s;
+    }
+    .auth-tab.active { background: var(--glass-strong); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+    .form-group input {
+      width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.3); color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: rgba(124,156,255,0.5); }
+    .auth-error { color: var(--danger); font-size: 0.8rem; margin-bottom: 12px; min-height: 1.2em; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-muted); font-size: 0.75rem;
+    }
+    .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-border); }
+    .btn-full { width: 100%; justify-content: center; padding: 12px; }
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 90; background: rgba(5,6,10,0.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal { width: 100%; max-width: 420px; padding: 28px; }
+    .modal h3 { font-size: 1.15rem; margin-bottom: 6px; }
+    .modal p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.45; }
+    .modal a { color: var(--accent); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); z-index: 200;
+      padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; background: var(--glass-strong);
+      border: 1px solid var(--glass-border); backdrop-filter: blur(20px); box-shadow: var(--shadow);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    @media (max-width: 640px) {
+      #app { padding: 10px; gap: 8px; }
+      .header { padding: 10px 12px; }
+      .brand h1 { font-size: 0.95rem; }
+      .msg { max-width: 92%; }
+      .auth-card { padding: 24px 20px; }
+    }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div id="app">
+    <header class="header glass">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>
+          <h1>news</h1>
+          <span>AI chat</span>
+        </div>
+      </div>
+      <div class="user-area" id="userArea"></div>
+    </header>
+    <main class="main glass chat-panel">
+      <div class="messages" id="messages">
+        <div class="empty" id="emptyState">
+          <div class="empty-icon">✧</div>
+          <h2>Start a conversation</h2>
+          <p>Your progress is saved when you sign in.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="Explain quantum computing simply">Quantum computing</button>
+            <button class="suggestion" data-prompt="Write a short poem about glass and light">Glass poem</button>
+            <button class="suggestion" data-prompt="Give me 5 creative startup ideas for 2026">Startup ideas</button>
+            <button class="suggestion" data-prompt="How does glassmorphism work in CSS?">Glassmorphism CSS</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-wrap">
+          <textarea id="userInput" rows="1" placeholder="Message…" disabled></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" disabled title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" />
+          </svg>
+        </button>
+      </div>
+    </main>
+  </div>
+  <div class="overlay" id="authOverlay">
+    <div class="auth-card glass glass-strong">
+      <div class="brand-icon" style="margin: 0 auto 16px; width: 48px; height: 48px; font-size: 22px;">✦</div>
+      <h2>Welcome</h2>
+      <p class="sub">Sign in to save your chats and continue anytime</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Sign in</button>
+        <button class="auth-tab" data-tab="signup">Sign up</button>
+      </div>
+      <div id="authForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="btn btn-primary btn-full" id="authSubmit">Sign in</button>
+      </div>
+      <div class="auth-divider">or</div>
+      <button class="btn btn-full" id="googleBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5.04c1.6 0 3.07.56 4.22 1.66l3.13-3.13C17.45 1.99 14.9 1 12 1 7.75 1 4.06 3.41 2.25 7.01l3.66 2.84C7.03 7.05 9.31 5.04 12 5.04z"/><path fill="#4285F4" d="M23 12.27c0-.81-.07-1.59-.21-2.34H12v4.43h6.18c-.27 1.41-1.07 2.61-2.27 3.41l3.57 2.77C21.22 18.33 23 15.59 23 12.27z"/><path fill="#FBBC05" d="M5.91 14.26c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09L2.25 7.24C1.45 8.76 1 10.43 1 12.17s.45 3.41 1.25 4.93l3.66-2.84z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.69 0-4.97-1.81-5.79-4.26L2.25 17.1C4.06 20.76 7.75 23 12 23z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <div class="modal glass glass-strong">
+      <h3>API Key</h3>
+      <p>
+        Your key is stored in Firebase under your account (not in the GitHub repo).
+        Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.
+      </p>
+      <div class="form-group">
+        <label for="apiKeyInput">API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="closeSettings">Cancel</button>
+        <button class="btn btn-primary" id="saveApiKey">Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+
+// ============================================================
+// FIREBASE CONFIG — replace with your project values
+// Project settings → Your apps → Web app
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDh-NtUH1fPRPrQkRbVt00--tS8giZNgWk",
+  authDomain: "news-sh.firebaseapp.com",
+  projectId: "news-sh",
+  storageBucket: "news-sh.firebasestorage.app",
+  messagingSenderId: "351883029343",
+  appId: "1:351883029343:web:5550f46ac65ed7c81f24ea"
+};
+
+const GEMINI_MODEL = "gemini-3.5-flash-lite";
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+let geminiApiKey = null;
+let conversationHistory = [];
+let isGenerating = false;
+let authMode = "login";
+
+const $ = (s) => document.querySelector(s);
+const messagesEl = $("#messages");
+const emptyState = $("#emptyState");
+const userInput = $("#userInput");
+const sendBtn = $("#sendBtn");
+const authOverlay = $("#authOverlay");
+const userArea = $("#userArea");
+const toastEl = $("#toast");
+
+function toast(msg, ms = 2800) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), ms);
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 140) + "px";
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function formatMessage(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`);
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+  return html;
+}
+
+function scrollToBottom() {
+  requestAnimationFrame(() => { messagesEl.scrollTop = messagesEl.scrollHeight; });
+}
+
+document.querySelectorAll(".auth-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    authMode = tab.dataset.tab;
+    $("#authSubmit").textContent = authMode === "login" ? "Sign in" : "Create account";
+    $("#authError").textContent = "";
+  });
+});
+
+$("#authSubmit").addEventListener("click", async () => {
+  const email = $("#email").value.trim();
+  const password = $("#password").value;
+  const errEl = $("#authError");
+  errEl.textContent = "";
+  if (!email || !password) { errEl.textContent = "Email and password required."; return; }
+  const btn = $("#authSubmit");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    if (authMode === "login") await auth.signInWithEmailAndPassword(email, password);
+    else await auth.createUserWithEmailAndPassword(email, password);
+  } catch (e) {
+    errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === "login" ? "Sign in" : "Create account";
+  }
+});
+
+$("#googleBtn").addEventListener("click", async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try { await auth.signInWithPopup(provider); }
+  catch (e) { $("#authError").textContent = e.message; }
+});
+
+auth.onAuthStateChanged(async (user) => {
+  currentUser = user;
+  if (user) {
+    authOverlay.classList.add("hidden");
+    userInput.disabled = false;
+    sendBtn.disabled = false;
+    renderUserArea(user);
+    await loadUserData(user.uid);
+  } else {
+    authOverlay.classList.remove("hidden");
+    userInput.disabled = true;
+    sendBtn.disabled = true;
+    userArea.innerHTML = "";
+    conversationHistory = [];
+    clearMessages();
+  }
+});
+
+function renderUserArea(user) {
+  const name = user.displayName || user.email?.split("@")[0] || "User";
+  const initials = name.slice(0, 2).toUpperCase();
+  userArea.innerHTML = `
+    <button class="btn btn-icon" id="settingsBtn" title="API key & settings">⚙️</button>
+    <div class="avatar" title="${escapeHtml(user.email || "")}">${initials}</div>
+    <button class="btn btn-ghost" id="logoutBtn">Sign out</button>
+  `;
+  $("#settingsBtn").onclick = openSettings;
+  $("#logoutBtn").onclick = () => auth.signOut();
+}
+
+async function loadUserData(uid) {
+  try {
+    const doc = await db.collection("users").doc(uid).get();
+    if (doc.exists) {
+      const data = doc.data();
+      geminiApiKey = data.geminiApiKey || null;
+      if (data.history && Array.isArray(data.history)) {
+        conversationHistory = data.history;
+        renderHistory();
+      }
+    }
+    if (!geminiApiKey) toast("Add your API key in settings (⚙️)");
+  } catch (e) {
+    console.error("Load user data:", e);
+    toast("Could not load saved progress");
+  }
+}
+
+async function saveHistory() {
+  if (!currentUser) return;
+  try {
+    await db.collection("users").doc(currentUser.uid).set(
+      { history: conversationHistory, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+  } catch (e) { console.error("Save history:", e); }
+}
+
+async function saveApiKey(key) {
+  if (!currentUser) return;
+  geminiApiKey = key;
+  await db.collection("users").doc(currentUser.uid).set(
+    { geminiApiKey: key, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+    { merge: true }
+  );
+  toast("API key saved securely");
+}
+
+function openSettings() {
+  $("#apiKeyInput").value = geminiApiKey || "";
+  $("#settingsModal").classList.remove("hidden");
+}
+$("#closeSettings").onclick = () => $("#settingsModal").classList.add("hidden");
+$("#saveApiKey").onclick = async () => {
+  const key = $("#apiKeyInput").value.trim();
+  if (!key) { toast("Please enter a key"); return; }
+  await saveApiKey(key);
+  $("#settingsModal").classList.add("hidden");
+};
+
+function clearMessages() {
+  messagesEl.innerHTML = "";
+  messagesEl.appendChild(emptyState);
+  emptyState.style.display = "flex";
+}
+
+function hideEmpty() { emptyState.style.display = "none"; }
+
+function appendMessage(role, text, animate = true) {
+  hideEmpty();
+  const div = document.createElement("div");
+  div.className = `msg ${role === "user" ? "user" : "assistant"}`;
+  if (!animate) div.style.animation = "none";
+  const label = role === "user" ? "You" : "AI";
+  div.innerHTML = `<div class="msg-bubble">${formatMessage(text)}</div><div class="msg-meta">${label}</div>`;
+  messagesEl.appendChild(div);
+  scrollToBottom();
+  return div;
+}
+
+function showTyping() {
+  hideEmpty();
+  const div = document.createElement("div");
+  div.className = "msg assistant typing-indicator";
+  div.innerHTML = `<div class="msg-bubble typing"><span></span><span></span><span></span></div>`;
+  messagesEl.appendChild(div);
+  scrollToBottom();
+  return div;
+}
+
+function renderHistory() {
+  messagesEl.innerHTML = "";
+  if (!conversationHistory.length) {
+    messagesEl.appendChild(emptyState);
+    emptyState.style.display = "flex";
+    return;
+  }
+  conversationHistory.forEach((turn) => {
+    const role = turn.role === "user" ? "user" : "assistant";
+    const text = turn.parts?.[0]?.text || "";
+    if (text) appendMessage(role, text, false);
+  });
+}
+
+async function callGemini(userText) {
+  if (!geminiApiKey) { openSettings(); toast("API key required"); return null; }
+  const contents = [...conversationHistory, { role: "user", parts: [{ text: userText }] }];
+  const res = await fetch(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(geminiApiKey)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents,
+      generationConfig: { maxOutputTokens: 8192 }
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error("Empty response from model");
+  return text;
+}
+
+async function sendMessage(text) {
+  text = (text || userInput.value).trim();
+  if (!text || isGenerating) return;
+  isGenerating = true;
+  sendBtn.disabled = true;
+  userInput.value = "";
+  autoResize(userInput);
+  appendMessage("user", text);
+  conversationHistory.push({ role: "user", parts: [{ text }] });
+  const typingEl = showTyping();
+  try {
+    const reply = await callGemini(text);
+    typingEl.remove();
+    appendMessage("assistant", reply);
+    conversationHistory.push({ role: "model", parts: [{ text: reply }] });
+    await saveHistory();
+  } catch (e) {
+    typingEl.remove();
+    appendMessage("assistant", `⚠️ ${e.message}`);
+    console.error(e);
+    if (/API key|PERMISSION|invalid|API_KEY/i.test(e.message)) openSettings();
+  } finally {
+    isGenerating = false;
+    sendBtn.disabled = false;
+    userInput.focus();
+  }
+}
+
+sendBtn.addEventListener("click", () => sendMessage());
+userInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+userInput.addEventListener("input", () => autoResize(userInput));
+document.querySelectorAll(".suggestion").forEach((btn) => {
+  btn.addEventListener("click", () => { if (currentUser) sendMessage(btn.dataset.prompt); });
+});
+
+window.clearChat = async () => {
+  conversationHistory = [];
+  clearMessages();
+  await saveHistory();
+  toast("Chat cleared");
+};
+
+  </script>
+</body>
+</html>
