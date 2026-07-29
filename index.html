@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="news — AI news generator by date and language" />
+  <title>news</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #05060a;
+      --glass: rgba(255, 255, 255, 0.045);
+      --glass-strong: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.18);
+      --accent: #7c9cff;
+      --accent-soft: rgba(124, 156, 255, 0.25);
+      --accent-glow: rgba(124, 156, 255, 0.45);
+      --text: #e8eaef;
+      --text-muted: #8b90a0;
+      --danger: #f87171;
+      --success: #5eead4;
+      --radius: 20px;
+      --blur: 24px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; font-family: var(--font); background: var(--bg-deep); color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    body { overflow-y: auto; min-height: 100%; }
+    .scene {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(80, 100, 220, 0.18), transparent 50%),
+        radial-gradient(ellipse 70% 50% at 85% 20%, rgba(120, 60, 200, 0.12), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 50% 90%, rgba(40, 160, 180, 0.1), transparent 50%),
+        var(--bg-deep);
+    }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55;
+      animation: float 18s ease-in-out infinite; will-change: transform;
+    }
+    .blob-1 { width: 42vw; height: 42vw; max-width: 520px; max-height: 520px; background: #4f6ef7; top: -10%; left: -8%; }
+    .blob-2 { width: 36vw; height: 36vw; max-width: 440px; max-height: 440px; background: #8b5cf6; top: 20%; right: -12%; animation-delay: -6s; animation-duration: 22s; }
+    .blob-3 { width: 48vw; height: 48vw; max-width: 580px; max-height: 580px; background: #0ea5a8; bottom: -18%; left: 25%; animation-delay: -12s; animation-duration: 26s; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(4%, 6%) scale(1.05); }
+      66% { transform: translate(-5%, 3%) scale(0.97); }
+    }
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur)) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 rgba(0,0,0,0.2);
+    }
+    .glass-strong {
+      background: var(--glass-strong);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #app {
+      position: relative; z-index: 1; max-width: 960px; margin: 0 auto;
+      padding: 16px; display: flex; flex-direction: column; gap: 14px; min-height: 100%;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; flex-shrink: 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: grid; place-items: center; box-shadow: 0 0 20px var(--accent-glow); font-size: 18px;
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em; }
+    .brand span { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; display: block; margin-top: 1px; }
+    .user-area { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: grid; place-items: center; font-size: 0.75rem; font-weight: 600;
+      border: 1px solid var(--glass-border); overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .btn {
+      appearance: none; border: 1px solid var(--glass-border); background: var(--glass);
+      color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 500;
+      padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(12px); display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { background: var(--glass-strong); border-color: var(--glass-highlight); box-shadow: 0 0 16px var(--accent-soft); }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(124,156,255,0.35), rgba(167,139,250,0.3));
+      border-color: rgba(124,156,255,0.45);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(124,156,255,0.5), rgba(167,139,250,0.4));
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { color: var(--text); background: var(--glass); }
+    .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 10px; justify-content: center; }
+    .btn-lg { padding: 14px 28px; font-size: 0.95rem; border-radius: 14px; }
+
+    /* Generator form — two columns */
+    .gen-panel { padding: 24px; }
+    .gen-panel h2 {
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em;
+    }
+    .gen-panel .hint { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+    .gen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 560px) {
+      .gen-grid { grid-template-columns: 1fr; }
+    }
+    .field label {
+      display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .field input, .field select {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
+      color: var(--text); font-family: inherit; font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: rgba(124,156,255,0.5); box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .field select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%238b90a0'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    .field input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .gen-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .gen-actions .btn-primary { flex: 1; justify-content: center; min-width: 140px; }
+
+    /* Result */
+    .result-panel { padding: 24px; display: none; }
+    .result-panel.visible { display: block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .result-meta {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center;
+    }
+    .chip {
+      font-size: 0.75rem; padding: 4px 10px; border-radius: 999px;
+      background: var(--accent-soft); border: 1px solid rgba(124,156,255,0.35); color: var(--accent);
+    }
+    .result-body {
+      font-size: 0.95rem; line-height: 1.65; white-space: pre-wrap; word-break: break-word;
+      color: var(--text);
+    }
+    .result-body h3 { font-size: 1.05rem; margin: 16px 0 8px; color: var(--text); }
+    .loading-row {
+      display: none; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;
+    }
+    .loading-row.show { display: flex; }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* History */
+    .history-panel { padding: 20px 24px; }
+    .history-panel h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-item {
+      padding: 12px 14px; border-radius: 12px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2); cursor: pointer; transition: border-color 0.2s;
+    }
+    .history-item:hover { border-color: rgba(124,156,255,0.4); }
+    .history-item .hi-top { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+    .history-item .hi-preview { font-size: 0.88rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Admin */
+    .admin-panel { padding: 20px 24px; display: none; }
+    .admin-panel.visible { display: block; }
+    .admin-panel h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .admin-panel .hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .admin-user {
+      display: flex; gap: 12px; align-items: flex-start; padding: 14px;
+      border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2);
+      margin-bottom: 10px;
+    }
+    .admin-user .av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #333; border: 1px solid var(--glass-border); }
+    .admin-user .info { flex: 1; min-width: 0; }
+    .admin-user .name { font-weight: 600; font-size: 0.9rem; }
+    .admin-user .email { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+    .admin-user .news-count { font-size: 0.75rem; color: var(--accent); }
+    .admin-news-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .admin-news-item {
+      font-size: 0.8rem; padding: 8px 10px; border-radius: 8px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+    .admin-news-item:hover { border-color: var(--accent); }
+
+    /* Auth overlay */
+    .overlay {
+      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(5,6,10,0.65); backdrop-filter: blur(12px);
+    }
+    .overlay.hidden { display: none; }
+    .auth-card { width: 100%; max-width: 400px; padding: 32px 28px; text-align: center; }
+    .auth-card h2 { font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .auth-card .sub { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px; }
+    .auth-tabs {
+      display: flex; gap: 4px; background: rgba(0,0,0,0.25); border-radius: 12px; padding: 4px; margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1; padding: 8px; border: none; background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.85rem; font-weight: 500; border-radius: 9px; cursor: pointer; transition: all 0.2s;
+    }
+    .auth-tab.active { background: var(--glass-strong); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+    .form-group input {
+      width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.3); color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none;
+    }
+    .form-group input:focus { border-color: rgba(124,156,255,0.5); }
+    .auth-error { color: var(--danger); font-size: 0.8rem; margin-bottom: 12px; min-height: 1.2em; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-muted); font-size: 0.75rem;
+    }
+    .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-border); }
+    .btn-full { width: 100%; justify-content: center; padding: 12px; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 90; background: rgba(5,6,10,0.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal { width: 100%; max-width: 420px; padding: 28px; }
+    .modal h3 { font-size: 1.15rem; margin-bottom: 6px; }
+    .modal p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.45; }
+    .modal a { color: var(--accent); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); z-index: 200;
+      padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; background: var(--glass-strong);
+      border: 1px solid var(--glass-border); backdrop-filter: blur(20px); box-shadow: var(--shadow);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none; max-width: 90%;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .tabs-bar {
+      display: flex; gap: 6px; padding: 4px; background: rgba(0,0,0,0.25); border-radius: 12px;
+      margin-bottom: 4px; width: fit-content;
+    }
+    .tab-btn {
+      padding: 7px 14px; border: none; background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.8rem; font-weight: 500; border-radius: 9px; cursor: pointer;
+    }
+    .tab-btn.active { background: var(--glass-strong); color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div id="app">
+    <header class="header glass">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>
+          <h1>news</h1>
+          <span>by date &amp; language</span>
+        </div>
+      </div>
+      <div class="user-area" id="userArea"></div>
+    </header>
+
+    <!-- Generator -->
+    <section class="gen-panel glass" id="genPanel">
+      <h2>Generate news</h2>
+      <p class="hint">Pick a date and language, then generate an AI news briefing.</p>
+      <div class="gen-grid">
+        <div class="field">
+          <label for="dateInput">Date</label>
+          <input type="date" id="dateInput" />
+        </div>
+        <div class="field">
+          <label for="langInput">Language</label>
+          <select id="langInput">
+            <option value="English">English</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Portuguese">Portuguese</option>
+            <option value="Arabic">Arabic</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Korean">Korean</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Bengali">Bengali</option>
+            <option value="Marathi">Marathi</option>
+            <option value="Gujarati">Gujarati</option>
+          </select>
+        </div>
+      </div>
+      <div class="gen-actions">
+        <button class="btn btn-primary btn-lg" id="generateBtn" disabled>Generate</button>
+        <div class="loading-row" id="loadingRow">
+          <span class="spinner"></span>
+          <span>Generating…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result -->
+    <section class="result-panel glass" id="resultPanel">
+      <div class="result-meta" id="resultMeta"></div>
+      <div class="result-body" id="resultBody"></div>
+    </section>
+
+    <!-- My history -->
+    <section class="history-panel glass" id="historyPanel">
+      <h3>Your news</h3>
+      <div class="history-list" id="historyList">
+        <p style="color:var(--text-muted);font-size:0.85rem;">No news yet — generate one above.</p>
+      </div>
+    </section>
+
+    <!-- Admin (only for admin email) -->
+    <section class="admin-panel glass" id="adminPanel">
+      <h3>Admin · all users</h3>
+      <p class="hint">Everyone’s profiles and generated news</p>
+      <div id="adminList"></div>
+    </section>
+  </div>
+
+  <!-- Auth -->
+  <div class="overlay" id="authOverlay">
+    <div class="auth-card glass glass-strong">
+      <div class="brand-icon" style="margin:0 auto 16px;width:48px;height:48px;font-size:22px;">✦</div>
+      <h2>Welcome to news</h2>
+      <p class="sub">Sign in to generate and save your briefings</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Sign in</button>
+        <button class="auth-tab" data-tab="signup">Sign up</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="btn btn-primary btn-full" id="authSubmit">Sign in</button>
+      </div>
+      <div class="auth-divider">or</div>
+      <button class="btn btn-full" id="googleBtn">Continue with Google</button>
+    </div>
+  </div>
+
+  <!-- API key settings -->
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <div class="modal glass glass-strong">
+      <h3>API Key</h3>
+      <p>
+        Your Gemini API key is stored in Firebase under your account.
+        Get one at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.
+      </p>
+      <div class="form-group">
+        <label for="apiKeyInput">API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="closeSettings">Cancel</button>
+        <button class="btn btn-primary" id="saveApiKey">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    // ============================================================
+    // FIREBASE CONFIG — paste your project values here
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "YOUR_FIREBASE_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const ADMIN_EMAIL = "jovialgamer96@gmail.com";
+    const GEMINI_MODEL = "gemini-3.5-flash-lite";
+    const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let geminiApiKey = null;
+    let isGenerating = false;
+    let authMode = "login";
+    let myNews = [];
+
+    const $ = (s) => document.querySelector(s);
+
+    // Default date = today
+    (function setToday() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      $("#dateInput").value = `${y}-${m}-${day}`;
+    })();
+
+    function toast(msg, ms = 3000) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), ms);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // ---------- Auth UI ----------
+    document.querySelectorAll(".auth-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        authMode = tab.dataset.tab;
+        $("#authSubmit").textContent = authMode === "login" ? "Sign in" : "Create account";
+        $("#authError").textContent = "";
+      });
+    });
+
+    $("#authSubmit").addEventListener("click", async () => {
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      const errEl = $("#authError");
+      errEl.textContent = "";
+      if (!email || !password) { errEl.textContent = "Email and password required."; return; }
+      const btn = $("#authSubmit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      try {
+        if (authMode === "login") await auth.signInWithEmailAndPassword(email, password);
+        else await auth.createUserWithEmailAndPassword(email, password);
+      } catch (e) {
+        errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = authMode === "login" ? "Sign in" : "Create account";
+      }
+    });
+
+    $("#googleBtn").addEventListener("click", async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const errEl = $("#authError");
+      errEl.textContent = "";
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (e) {
+        if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
+          try { await auth.signInWithRedirect(provider); }
+          catch (e2) { errEl.textContent = e2.message; }
+        } else {
+          errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+        }
+      }
+    });
+
+    auth.getRedirectResult().catch((e) => {
+      if (e && e.code && e.code !== "auth/null-user") {
+        const errEl = $("#authError");
+        if (errEl) errEl.textContent = e.message;
+      }
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      if (user) {
+        $("#authOverlay").classList.add("hidden");
+        $("#generateBtn").disabled = false;
+        renderUserArea(user);
+        await ensureUserProfile(user);
+        await loadMyData(user.uid);
+        if (isAdmin(user)) {
+          $("#adminPanel").classList.add("visible");
+          await loadAdminData();
+        } else {
+          $("#adminPanel").classList.remove("visible");
+        }
+      } else {
+        $("#authOverlay").classList.remove("hidden");
+        $("#generateBtn").disabled = true;
+        $("#userArea").innerHTML = "";
+        $("#adminPanel").classList.remove("visible");
+        myNews = [];
+        renderHistory();
+      }
+    });
+
+    function isAdmin(user) {
+      return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    function renderUserArea(user) {
+      const name = user.displayName || user.email?.split("@")[0] || "User";
+      const initials = name.slice(0, 2).toUpperCase();
+      const photo = user.photoURL;
+      const avHtml = photo
+        ? `<div class="avatar"><img src="${escapeHtml(photo)}" alt="" referrerpolicy="no-referrer" /></div>`
+        : `<div class="avatar">${initials}</div>`;
+      $("#userArea").innerHTML = `
+        <button class="btn btn-icon" id="settingsBtn" title="API key">⚙️</button>
+        ${avHtml}
+        <button class="btn btn-ghost" id="logoutBtn">Sign out</button>
+      `;
+      $("#settingsBtn").onclick = openSettings;
+      $("#logoutBtn").onclick = () => auth.signOut();
+    }
+
+    // ---------- Profile + data ----------
+    async function ensureUserProfile(user) {
+      const ref = db.collection("users").doc(user.uid);
+      const snap = await ref.get();
+      const base = {
+        email: user.email || "",
+        displayName: user.displayName || user.email?.split("@")[0] || "User",
+        photoURL: user.photoURL || "",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      if (!snap.exists) {
+        await ref.set({ ...base, createdAt: firebase.firestore.FieldValue.serverTimestamp(), geminiApiKey: null });
+      } else {
+        await ref.set(base, { merge: true });
+      }
+    }
+
+    async function loadMyData(uid) {
+      try {
+        const doc = await db.collection("users").doc(uid).get();
+        if (doc.exists) {
+          geminiApiKey = doc.data().geminiApiKey || null;
+        }
+        const newsSnap = await db.collection("users").doc(uid).collection("news")
+          .orderBy("createdAt", "desc").limit(30).get();
+        myNews = newsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        renderHistory();
+        if (!geminiApiKey) toast("Add your API key in settings (⚙️)");
+      } catch (e) {
+        console.error(e);
+        toast("Could not load your data — check Firestore rules");
+      }
+    }
+
+    async function saveApiKey(key) {
+      if (!currentUser) return;
+      geminiApiKey = key;
+      await db.collection("users").doc(currentUser.uid).set(
+        { geminiApiKey: key, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+        { merge: true }
+      );
+      toast("API key saved");
+    }
+
+    function openSettings() {
+      $("#apiKeyInput").value = geminiApiKey || "";
+      $("#settingsModal").classList.remove("hidden");
+    }
+    $("#closeSettings").onclick = () => $("#settingsModal").classList.add("hidden");
+    $("#saveApiKey").onclick = async () => {
+      const key = $("#apiKeyInput").value.trim();
+      if (!key) { toast("Please enter a key"); return; }
+      await saveApiKey(key);
+      $("#settingsModal").classList.add("hidden");
+    };
+
+    function renderHistory() {
+      const list = $("#historyList");
+      if (!myNews.length) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">No news yet — generate one above.</p>`;
+        return;
+      }
+      list.innerHTML = myNews.map((n) => `
+        <div class="history-item" data-id="${escapeHtml(n.id)}">
+          <div class="hi-top">
+            <span>${escapeHtml(n.date || "")} · ${escapeHtml(n.language || "")}</span>
+            <span>${n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString() : ""}</span>
+          </div>
+          <div class="hi-preview">${escapeHtml((n.content || "").slice(0, 120))}…</div>
+        </div>
+      `).join("");
+      list.querySelectorAll(".history-item").forEach((el) => {
+        el.onclick = () => {
+          const item = myNews.find((x) => x.id === el.dataset.id);
+          if (item) showResult(item);
+        };
+      });
+    }
+
+    function showResult(item) {
+      const panel = $("#resultPanel");
+      panel.classList.add("visible");
+      $("#resultMeta").innerHTML = `
+        <span class="chip">${escapeHtml(item.date || "")}</span>
+        <span class="chip">${escapeHtml(item.language || "")}</span>
+      `;
+      $("#resultBody").textContent = item.content || "";
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // ---------- Generate ----------
+    async function callGemini(dateStr, language) {
+      if (!geminiApiKey) {
+        openSettings();
+        toast("API key required");
+        return null;
+      }
+      const prompt = `You are a professional news editor. Write a clear, factual-style daily news briefing for the date ${dateStr}, entirely in ${language}.
+
+Structure:
+1. A short headline for the day
+2. 4–6 bullet-style news items covering world, tech, business, science, and culture (plausible general knowledge for that period; if the date is in the future relative to your knowledge, write thoughtful forward-looking analysis labeled as such)
+3. A one-paragraph closing summary
+
+Tone: neutral, informative, concise. Language: ${language} only. Do not mention that you are an AI.`;
+
+      const res = await fetch(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(geminiApiKey)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 4096 }
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("Empty response from model");
+      return text;
+    }
+
+    $("#generateBtn").addEventListener("click", async () => {
+      if (!currentUser || isGenerating) return;
+      const dateStr = $("#dateInput").value;
+      const language = $("#langInput").value;
+      if (!dateStr) { toast("Pick a date"); return; }
+
+      isGenerating = true;
+      $("#generateBtn").disabled = true;
+      $("#loadingRow").classList.add("show");
+
+      try {
+        const content = await callGemini(dateStr, language);
+        if (!content) return;
+
+        const docRef = await db.collection("users").doc(currentUser.uid).collection("news").add({
+          date: dateStr,
+          language,
+          content,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+        const item = { id: docRef.id, date: dateStr, language, content, createdAt: { toDate: () => new Date() } };
+        myNews.unshift(item);
+        renderHistory();
+        showResult(item);
+        toast("News generated & saved");
+
+        if (isAdmin(currentUser)) await loadAdminData();
+      } catch (e) {
+        console.error(e);
+        toast(e.message || "Generation failed");
+        if (/API key|PERMISSION|invalid|API_KEY/i.test(e.message || "")) openSettings();
+      } finally {
+        isGenerating = false;
+        $("#generateBtn").disabled = false;
+        $("#loadingRow").classList.remove("show");
+      }
+    });
+
+    // ---------- Admin ----------
+    async function loadAdminData() {
+      const list = $("#adminList");
+      list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">Loading…</p>`;
+      try {
+        const usersSnap = await db.collection("users").get();
+        if (usersSnap.empty) {
+          list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">No users yet.</p>`;
+          return;
+        }
+        const blocks = [];
+        for (const uDoc of usersSnap.docs) {
+          const u = uDoc.data();
+          const newsSnap = await db.collection("users").doc(uDoc.id).collection("news")
+            .orderBy("createdAt", "desc").limit(10).get();
+          const newsItems = newsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          const photo = u.photoURL
+            ? `<img class="av" src="${escapeHtml(u.photoURL)}" alt="" referrerpolicy="no-referrer" />`
+            : `<div class="av" style="display:grid;place-items:center;font-size:0.8rem;font-weight:600;">${escapeHtml((u.displayName || "?").slice(0, 2).toUpperCase())}</div>`;
+          const newsHtml = newsItems.length
+            ? `<div class="admin-news-list">${newsItems.map((n) =>
+                `<div class="admin-news-item" data-content="${escapeHtml(n.content || "").replace(/"/g, "&quot;")}">
+                  <strong>${escapeHtml(n.date || "")}</strong> · ${escapeHtml(n.language || "")}<br/>
+                  <span style="color:var(--text-muted)">${escapeHtml((n.content || "").slice(0, 80))}…</span>
+                </div>`
+              ).join("")}</div>`
+            : `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">No news yet</p>`;
+          blocks.push(`
+            <div class="admin-user">
+              ${photo}
+              <div class="info">
+                <div class="name">${escapeHtml(u.displayName || "User")}</div>
+                <div class="email">${escapeHtml(u.email || uDoc.id)}</div>
+                <div class="news-count">${newsItems.length} recent news item(s)</div>
+                ${newsHtml}
+              </div>
+            </div>
+          `);
+        }
+        list.innerHTML = blocks.join("");
+        list.querySelectorAll(".admin-news-item").forEach((el) => {
+          el.onclick = () => {
+            const content = el.getAttribute("data-content") || "";
+            $("#resultPanel").classList.add("visible");
+            $("#resultMeta").innerHTML = `<span class="chip">Admin preview</span>`;
+            $("#resultBody").textContent = content;
+            $("#resultPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+          };
+        });
+      } catch (e) {
+        console.error(e);
+        list.innerHTML = `<p style="color:var(--danger);font-size:0.85rem;">Admin load failed: ${escapeHtml(e.message)}. Update Firestore rules for admin access.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
