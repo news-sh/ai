@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="news — AI news by date and language" />
+  <title>news</title>
+  <!-- Favicon / app icon — replace favicon.png with your own (works on GitHub Pages) -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root, [data-theme="default"] {
+      --bg-deep: #05060a;
+      --glass: rgba(255, 255, 255, 0.045);
+      --glass-strong: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.18);
+      --accent: #7c9cff;
+      --accent-soft: rgba(124, 156, 255, 0.25);
+      --accent-glow: rgba(124, 156, 255, 0.45);
+      --accent-2: #a78bfa;
+      --text: #e8eaef;
+      --text-muted: #8b90a0;
+      --danger: #f87171;
+      --success: #5eead4;
+      --radius: 20px;
+      --blur: 24px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+      --blob-1: #4f6ef7;
+      --blob-2: #8b5cf6;
+      --blob-3: #0ea5a8;
+      --scene-1: rgba(80, 100, 220, 0.18);
+      --scene-2: rgba(120, 60, 200, 0.12);
+      --scene-3: rgba(40, 160, 180, 0.1);
+      --input-bg: rgba(0, 0, 0, 0.3);
+      --option-bg: #12141c;
+    }
+    [data-theme="lite"] {
+      --bg-deep: #f0f2f8;
+      --glass: rgba(255, 255, 255, 0.72);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.95);
+      --accent: #4f6ef7;
+      --accent-soft: rgba(79, 110, 247, 0.18);
+      --accent-glow: rgba(79, 110, 247, 0.35);
+      --accent-2: #7c5cbf;
+      --text: #1a1d27;
+      --text-muted: #5c6378;
+      --danger: #dc2626;
+      --success: #0d9488;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --blob-1: #93a8f8;
+      --blob-2: #c4b5fd;
+      --blob-3: #5eead4;
+      --scene-1: rgba(79, 110, 247, 0.12);
+      --scene-2: rgba(124, 92, 191, 0.1);
+      --scene-3: rgba(14, 165, 168, 0.08);
+      --input-bg: rgba(255, 255, 255, 0.85);
+      --option-bg: #ffffff;
+    }
+    [data-theme="pink"] {
+      --bg-deep: #1a0a12;
+      --glass: rgba(255, 182, 210, 0.06);
+      --glass-strong: rgba(255, 182, 210, 0.12);
+      --glass-border: rgba(255, 150, 190, 0.2);
+      --glass-highlight: rgba(255, 200, 220, 0.25);
+      --accent: #f472b6;
+      --accent-soft: rgba(244, 114, 182, 0.28);
+      --accent-glow: rgba(244, 114, 182, 0.5);
+      --accent-2: #fb7185;
+      --text: #fdf2f8;
+      --text-muted: #c4a0b0;
+      --danger: #fb7185;
+      --success: #5eead4;
+      --shadow: 0 8px 32px rgba(80, 20, 50, 0.45);
+      --blob-1: #ec4899;
+      --blob-2: #f43f5e;
+      --blob-3: #d946ef;
+      --scene-1: rgba(236, 72, 153, 0.2);
+      --scene-2: rgba(244, 63, 94, 0.14);
+      --scene-3: rgba(217, 70, 239, 0.12);
+      --input-bg: rgba(0, 0, 0, 0.35);
+      --option-bg: #2a1020;
+    }
+    [data-theme="dark-pink"] {
+      --bg-deep: #0c0508;
+      --glass: rgba(255, 100, 150, 0.05);
+      --glass-strong: rgba(255, 100, 150, 0.1);
+      --glass-border: rgba(255, 80, 130, 0.18);
+      --glass-highlight: rgba(255, 140, 180, 0.2);
+      --accent: #e11d8a;
+      --accent-soft: rgba(225, 29, 138, 0.3);
+      --accent-glow: rgba(225, 29, 138, 0.55);
+      --accent-2: #be185d;
+      --text: #fce7f3;
+      --text-muted: #9d7a8c;
+      --danger: #f43f5e;
+      --success: #5eead4;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+      --blob-1: #9d174d;
+      --blob-2: #be185d;
+      --blob-3: #831843;
+      --scene-1: rgba(157, 23, 77, 0.22);
+      --scene-2: rgba(190, 24, 93, 0.16);
+      --scene-3: rgba(131, 24, 67, 0.12);
+      --input-bg: rgba(0, 0, 0, 0.4);
+      --option-bg: #1a0a10;
+    }
+    [data-theme="red"] {
+      --bg-deep: #0c0606;
+      --glass: rgba(255, 80, 80, 0.05);
+      --glass-strong: rgba(255, 80, 80, 0.1);
+      --glass-border: rgba(255, 100, 100, 0.18);
+      --glass-highlight: rgba(255, 140, 140, 0.22);
+      --accent: #ef4444;
+      --accent-soft: rgba(239, 68, 68, 0.28);
+      --accent-glow: rgba(239, 68, 68, 0.5);
+      --accent-2: #f87171;
+      --text: #fef2f2;
+      --text-muted: #a89090;
+      --danger: #fca5a5;
+      --success: #5eead4;
+      --shadow: 0 8px 32px rgba(40, 0, 0, 0.5);
+      --blob-1: #dc2626;
+      --blob-2: #b91c1c;
+      --blob-3: #991b1b;
+      --scene-1: rgba(220, 38, 38, 0.2);
+      --scene-2: rgba(185, 28, 28, 0.14);
+      --scene-3: rgba(153, 27, 27, 0.1);
+      --input-bg: rgba(0, 0, 0, 0.35);
+      --option-bg: #1a0c0c;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; font-family: var(--font); background: var(--bg-deep); color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    body { overflow-y: auto; min-height: 100%; }
+    .scene {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, var(--scene-1), transparent 50%),
+        radial-gradient(ellipse 70% 50% at 85% 20%, var(--scene-2), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 50% 90%, var(--scene-3), transparent 50%),
+        var(--bg-deep);
+      transition: background 0.4s ease;
+    }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55;
+      animation: float 18s ease-in-out infinite; will-change: transform;
+      transition: background 0.4s ease;
+    }
+    .blob-1 { width: 42vw; height: 42vw; max-width: 520px; max-height: 520px; background: var(--blob-1); top: -10%; left: -8%; }
+    .blob-2 { width: 36vw; height: 36vw; max-width: 440px; max-height: 440px; background: var(--blob-2); top: 20%; right: -12%; animation-delay: -6s; animation-duration: 22s; }
+    .blob-3 { width: 48vw; height: 48vw; max-width: 580px; max-height: 580px; background: var(--blob-3); bottom: -18%; left: 25%; animation-delay: -12s; animation-duration: 26s; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(4%, 6%) scale(1.05); }
+      66% { transform: translate(-5%, 3%) scale(0.97); }
+    }
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur)) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 rgba(0,0,0,0.2);
+    }
+    .glass-strong {
+      background: var(--glass-strong);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #app {
+      position: relative; z-index: 1; max-width: 960px; margin: 0 auto;
+      padding: 16px; display: flex; flex-direction: column; gap: 14px; min-height: 100%;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; flex-shrink: 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; box-shadow: 0 0 20px var(--accent-glow); font-size: 18px;
+      overflow: hidden;
+    }
+    .brand-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .brand h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em; }
+    .brand span { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; display: block; margin-top: 1px; }
+    .user-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .theme-switcher {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px; border-radius: 999px; border: 1px solid var(--glass-border);
+      background: var(--glass);
+    }
+    .theme-btn {
+      width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; padding: 0; appearance: none; transition: transform 0.15s, border-color 0.15s;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    .theme-btn:hover { transform: scale(1.12); }
+    .theme-btn.active { border-color: var(--text); box-shadow: 0 0 0 2px var(--accent-soft); }
+    .theme-btn[data-theme="default"] { background: linear-gradient(135deg, #4f6ef7, #8b5cf6); }
+    .theme-btn[data-theme="lite"] { background: linear-gradient(135deg, #e8eaf0, #ffffff); border-color: #ccc; }
+    .theme-btn[data-theme="pink"] { background: linear-gradient(135deg, #f472b6, #fb7185); }
+    .theme-btn[data-theme="dark-pink"] { background: linear-gradient(135deg, #9d174d, #e11d8a); }
+    .theme-btn[data-theme="red"] { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: grid; place-items: center; font-size: 0.75rem; font-weight: 600;
+      border: 1px solid var(--glass-border); overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .btn {
+      appearance: none; border: 1px solid var(--glass-border); background: var(--glass);
+      color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 500;
+      padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(12px); display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { background: var(--glass-strong); border-color: var(--glass-highlight); box-shadow: 0 0 16px var(--accent-soft); }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--accent-2) 30%, transparent));
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--accent-2) 45%, transparent));
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { color: var(--text); background: var(--glass); }
+    .btn-danger { border-color: rgba(248,113,113,0.4); color: var(--danger); }
+    .btn-lg { padding: 14px 28px; font-size: 0.95rem; border-radius: 14px; }
+    .btn-full { width: 100%; justify-content: center; padding: 12px; }
+    .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+
+    .gen-panel { padding: 24px; }
+    .gen-panel h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .gen-panel .hint { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+    .gen-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+    }
+    @media (max-width: 560px) { .gen-grid { grid-template-columns: 1fr; } }
+    .field label {
+      display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .field input, .field select, .form-group input {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--glass-border); background: var(--input-bg);
+      color: var(--text); font-family: inherit; font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus, .form-group input:focus {
+      border-color: rgba(124,156,255,0.5); box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "";
+      position: absolute; right: 14px; top: 50%; transform: translateY(-40%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent; border-right: 5px solid transparent;
+      border-top: 6px solid #8b90a0; pointer-events: none;
+    }
+    .field select {
+      appearance: none; -webkit-appearance: none; -moz-appearance: none;
+      width: 100%; padding: 12px 40px 12px 14px; border-radius: 12px;
+      border: 1px solid var(--glass-border); background: var(--input-bg);
+      color: var(--text); font-family: inherit; font-size: 0.95rem; outline: none;
+      cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field select:hover { border-color: var(--accent-soft); }
+    .field select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .field select option {
+      background: var(--option-bg); color: var(--text); padding: 10px;
+    }
+    .field input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .gen-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .gen-actions .btn-primary { flex: 1; justify-content: center; min-width: 140px; }
+
+    .result-panel { padding: 24px; display: none; }
+    .result-panel.visible { display: block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .result-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+    .chip {
+      font-size: 0.75rem; padding: 4px 10px; border-radius: 999px;
+      background: var(--accent-soft); border: 1px solid rgba(124,156,255,0.35); color: var(--accent);
+    }
+    .result-body {
+      font-size: 0.95rem; line-height: 1.7; word-break: break-word; color: var(--text);
+    }
+    .result-body p { margin: 0 0 14px; }
+    .result-body > p:first-of-type { margin-top: 0; }
+    .result-body strong { font-weight: 600; color: #f0f2f7; }
+    .result-body h3.news-section {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--accent); margin: 22px 0 12px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--glass-border);
+    }
+    .result-body h3.news-section:first-child { margin-top: 0; }
+
+    .result-body em { font-style: italic; color: var(--text-muted); }
+    .result-body ul {
+      margin: 0 0 16px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 12px;
+    }
+    .result-body li {
+      position: relative; padding: 12px 14px 12px 16px;
+      border-radius: 12px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.22); line-height: 1.55;
+    }
+    .result-body li::before {
+      content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+      border-radius: 2px; background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    }
+    .loading-row {
+      display: none; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;
+    }
+    .loading-row.show { display: flex; }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .history-panel { padding: 20px 24px; }
+    .history-panel h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-item {
+      padding: 12px 14px; border-radius: 12px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2); cursor: pointer; transition: border-color 0.2s;
+    }
+    .history-item:hover { border-color: rgba(124,156,255,0.4); }
+    .history-item .hi-top { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+    .history-item .hi-preview { font-size: 0.88rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .admin-panel { padding: 20px 24px; display: none; }
+    .admin-panel.visible { display: block; }
+    .admin-panel h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .admin-panel .hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .admin-section { margin-bottom: 22px; }
+    .admin-section h4 {
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    .chamber-add {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .chamber-add input { flex: 1; min-width: 160px; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: var(--text);
+      font-family: inherit; font-size: 0.85rem; outline: none;
+    }
+    .key-list { display: flex; flex-direction: column; gap: 8px; }
+    .key-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 12px; border-radius: 10px; border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2); font-size: 0.82rem;
+    }
+    .key-row .masked { font-family: ui-monospace, monospace; color: var(--text-muted); letter-spacing: 0.02em; }
+    .key-row .badge {
+      font-size: 0.7rem; padding: 2px 8px; border-radius: 999px;
+      background: rgba(94,234,212,0.15); color: var(--success); border: 1px solid rgba(94,234,212,0.3);
+    }
+    .key-row .badge.off {
+      background: rgba(248,113,113,0.12); color: var(--danger); border-color: rgba(248,113,113,0.3);
+    }
+    .admin-user {
+      display: flex; gap: 12px; align-items: flex-start; padding: 14px;
+      border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2);
+      margin-bottom: 10px;
+    }
+    .admin-user .av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #333; border: 1px solid var(--glass-border); }
+    .admin-user .info { flex: 1; min-width: 0; }
+    .admin-user .name { font-weight: 600; font-size: 0.9rem; }
+    .admin-user .email { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+    .admin-user .news-count { font-size: 0.75rem; color: var(--accent); }
+    .admin-news-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .admin-news-item {
+      font-size: 0.8rem; padding: 8px 10px; border-radius: 8px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); cursor: pointer;
+    }
+    .admin-news-item:hover { border-color: var(--accent); }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(5,6,10,0.65); backdrop-filter: blur(12px);
+    }
+    .overlay.hidden { display: none; }
+    .auth-card { width: 100%; max-width: 400px; padding: 32px 28px; text-align: center; }
+    .auth-card h2 { font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; }
+    .auth-card .sub { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px; }
+    .auth-tabs {
+      display: flex; gap: 4px; background: rgba(0,0,0,0.25); border-radius: 12px; padding: 4px; margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1; padding: 8px; border: none; background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.85rem; font-weight: 500; border-radius: 9px; cursor: pointer;
+    }
+    .auth-tab.active { background: var(--glass-strong); color: var(--text); }
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+    .auth-error { color: var(--danger); font-size: 0.8rem; margin-bottom: 12px; min-height: 1.2em; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-muted); font-size: 0.75rem;
+    }
+    .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--glass-border); }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); z-index: 200;
+      padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; background: var(--glass-strong);
+      border: 1px solid var(--glass-border); backdrop-filter: blur(20px); box-shadow: var(--shadow);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none; max-width: 90%;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div id="app">
+    <header class="header glass">
+      <div class="brand">
+        <div class="brand-icon" id="brandIcon">✦</div>
+        <div>
+          <h1>news</h1>
+          <span>by date &amp; language</span>
+        </div>
+      </div>
+      <div class="user-area" id="userArea">
+        <div class="theme-switcher" id="themeSwitcher" title="Theme">
+          <button type="button" class="theme-btn active" data-theme="default" title="Default"></button>
+          <button type="button" class="theme-btn" data-theme="lite" title="Lite"></button>
+          <button type="button" class="theme-btn" data-theme="pink" title="Pink"></button>
+          <button type="button" class="theme-btn" data-theme="dark-pink" title="Dark pink"></button>
+          <button type="button" class="theme-btn" data-theme="red" title="Red"></button>
+        </div>
+      </div>
+    </header>
+
+    <section class="gen-panel glass">
+      <h2>Generate news</h2>
+      <p class="hint">Pick a date and language. Briefings pull real India-focused events (search-grounded when the API key allows).</p>
+      <div class="gen-grid">
+        <div class="field">
+          <label for="dateInput">Date</label>
+          <input type="date" id="dateInput" />
+        </div>
+        <div class="field">
+          <label for="langInput">Language</label>
+          <div class="select-wrap">
+            <select id="langInput">
+              <option value="English">English</option>
+              <option value="Malayalam">Malayalam</option>
+              <option value="Hindi">Hindi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="gen-actions">
+        <button class="btn btn-primary btn-lg" id="generateBtn" disabled>Generate</button>
+        <button class="btn btn-lg" id="viewAllBtn" disabled>View all news</button>
+        <div class="loading-row" id="loadingRow">
+          <span class="spinner"></span>
+          <span id="loadingText">Generating…</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="result-panel glass" id="resultPanel">
+      <div class="result-meta" id="resultMeta"></div>
+      <div class="result-body" id="resultBody"></div>
+    </section>
+
+    <section class="history-panel glass" id="historyPanel">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <h3 style="margin:0;">All your news</h3>
+        <span id="newsCount" style="font-size:0.75rem;color:var(--text-muted);"></span>
+      </div>
+      <div class="history-list" id="historyList">
+        <p style="color:var(--text-muted);font-size:0.85rem;">No news yet — generate one above.</p>
+      </div>
+    </section>
+
+    <section class="admin-panel glass" id="adminPanel">
+      <h3>Admin</h3>
+      <p class="hint">API chamber + all users &amp; their news</p>
+
+      <div class="admin-section">
+        <h4>API chamber</h4>
+        <p class="hint" style="margin-top:-6px;">Keys rotate on each generate (round-robin). New keys often start with <code style="color:var(--accent)">aq</code>.</p>
+        <div class="chamber-add">
+          <input type="text" id="newKeyInput" placeholder="Paste API key (e.g. aq…)" autocomplete="off" />
+          <input type="text" id="newKeyLabel" placeholder="Label (optional)" style="max-width:140px" />
+          <button class="btn btn-primary btn-sm" id="addKeyBtn">Add key</button>
+        </div>
+        <div class="key-list" id="keyList">
+          <p style="color:var(--text-muted);font-size:0.85rem;">No keys yet.</p>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h4>All users</h4>
+        <div id="adminList"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="overlay" id="authOverlay">
+    <div class="auth-card glass glass-strong">
+      <div class="brand-icon" style="margin:0 auto 16px;width:48px;height:48px;font-size:22px;">✦</div>
+      <h2>Welcome to news</h2>
+      <p class="sub">Sign in to generate and save your briefings</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Sign in</button>
+        <button class="auth-tab" data-tab="signup">Sign up</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="btn btn-primary btn-full" id="authSubmit">Sign in</button>
+      </div>
+      <div class="auth-divider">or</div>
+      <button class="btn btn-full" id="googleBtn">Continue with Google</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    // ============================================================
+    // FIREBASE CONFIG — paste your project values
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDh-NtUH1fPRPrQkRbVt00--tS8giZNgWk",
+      authDomain: "news-sh.firebaseapp.com",
+      projectId: "news-sh",
+      storageBucket: "news-sh.firebasestorage.app",
+      messagingSenderId: "351883029343",
+      appId: "1:351883029343:web:5550f46ac65ed7c81f24ea",
+      measurementId: "G-94T90Q990R"
+    };
+
+    const ADMIN_EMAIL = "jovialgamer96@gmail.com";
+    // Only gemini-3.5-flash-lite
+    const GEMINI_MODELS = [
+      "gemini-3.5-flash-lite"
+    ];
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let isGenerating = false;
+    let authMode = "login";
+    let myNews = [];
+    let chamberKeys = []; // { id, key, label, active, useCount }
+    let chamberIndex = 0;
+
+    const $ = (s) => document.querySelector(s);
+
+    // ---------- Themes ----------
+    function applyTheme(name) {
+      const t = name || "default";
+      document.documentElement.setAttribute("data-theme", t);
+      localStorage.setItem("newsTheme", t);
+      document.querySelectorAll(".theme-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.theme === t);
+      });
+    }
+    function bindThemeButtons() {
+      document.querySelectorAll(".theme-btn").forEach((btn) => {
+        btn.onclick = () => applyTheme(btn.dataset.theme);
+      });
+    }
+    (function initTheme() {
+      const saved = localStorage.getItem("newsTheme") || "default";
+      applyTheme(saved);
+      bindThemeButtons();
+    })();
+
+    // Optional custom brand icon (same folder as index.html on GitHub Pages)
+    (function tryBrandIcon() {
+      const img = new Image();
+      img.onload = () => {
+        const el = $("#brandIcon");
+        if (el) el.innerHTML = `<img src="favicon.png" alt="" />`;
+      };
+      img.src = "favicon.png";
+    })();
+
+    (function setToday() {
+      const d = new Date();
+      $("#dateInput").value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    })();
+
+    function toast(msg, ms = 3000) {
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), ms);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function formatNewsHtml(text) {
+      let t = escapeHtml(text || "");
+      // section headers: Headlines / Sports news (and common translations)
+      t = t.replace(/^(Headlines|Sports news|ഹെഡ്‌ലൈൻസ്|കായിക വാർത്തകൾ|शीर्षक|खेल समाचार)\s*$/gim,
+        (m) => `<h3 class="news-section">${m.trim()}</h3>`);
+      // bold **text**
+      t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      // lines that look like a title (short, no period at end) after section - keep as strong via markdown
+      // bullet lines
+      t = t.replace(/^(?:\*|\-|•)\s+(.+)$/gm, "<li>$1</li>");
+      t = t.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, (block) => "<ul>" + block + "</ul>");
+      // split remaining into blocks
+      const parts = t.split(/(<h3 class="news-section">[\s\S]*?<\/h3>|<ul>[\s\S]*?<\/ul>)/);
+      return parts.map((p) => {
+        p = p.trim();
+        if (!p) return "";
+        if (p.startsWith("<h3") || p.startsWith("<ul")) return p;
+        return p.split(/\n\n+/).map((para) => {
+          para = para.trim();
+          if (!para) return "";
+          return "<p>" + para.replace(/\n/g, "<br>") + "</p>";
+        }).join("");
+      }).join("");
+    }
+
+    function maskKey(k) {
+      if (!k || k.length < 8) return "••••";
+      return k.slice(0, 4) + "…" + k.slice(-4);
+    }
+
+    function isAdmin(user) {
+      return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    // ---------- Auth ----------
+    document.querySelectorAll(".auth-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        authMode = tab.dataset.tab;
+        $("#authSubmit").textContent = authMode === "login" ? "Sign in" : "Create account";
+        $("#authError").textContent = "";
+      });
+    });
+
+    $("#authSubmit").addEventListener("click", async () => {
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      const errEl = $("#authError");
+      errEl.textContent = "";
+      if (!email || !password) { errEl.textContent = "Email and password required."; return; }
+      const btn = $("#authSubmit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      try {
+        if (authMode === "login") await auth.signInWithEmailAndPassword(email, password);
+        else await auth.createUserWithEmailAndPassword(email, password);
+      } catch (e) {
+        errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = authMode === "login" ? "Sign in" : "Create account";
+      }
+    });
+
+    $("#googleBtn").addEventListener("click", async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const errEl = $("#authError");
+      errEl.textContent = "";
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (e) {
+        if (["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(e.code)) {
+          try { await auth.signInWithRedirect(provider); } catch (e2) { errEl.textContent = e2.message; }
+        } else {
+          errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+        }
+      }
+    });
+
+    auth.getRedirectResult().catch(() => {});
+
+    auth.onAuthStateChanged(async (user) => {
+      currentUser = user;
+      if (user) {
+        $("#authOverlay").classList.add("hidden");
+        $("#generateBtn").disabled = false;
+        $("#viewAllBtn").disabled = false;
+        renderUserArea(user);
+        await ensureUserProfile(user);
+        await loadMyNews(user.uid);
+        await loadChamberKeys(); // needed for generate
+        if (isAdmin(user)) {
+          $("#adminPanel").classList.add("visible");
+          renderKeyList();
+          await loadAdminUsers();
+        } else {
+          $("#adminPanel").classList.remove("visible");
+        }
+      } else {
+        $("#authOverlay").classList.remove("hidden");
+        $("#generateBtn").disabled = true;
+        if ($("#viewAllBtn")) $("#viewAllBtn").disabled = true;
+        $("#userArea").innerHTML = `<div class="theme-switcher" id="themeSwitcher" title="Theme">
+          <button type="button" class="theme-btn" data-theme="default" title="Default"></button>
+          <button type="button" class="theme-btn" data-theme="lite" title="Lite"></button>
+          <button type="button" class="theme-btn" data-theme="pink" title="Pink"></button>
+          <button type="button" class="theme-btn" data-theme="dark-pink" title="Dark pink"></button>
+          <button type="button" class="theme-btn" data-theme="red" title="Red"></button>
+        </div>`;
+        bindThemeButtons();
+        const cur = document.documentElement.getAttribute("data-theme") || "default";
+        document.querySelectorAll(".theme-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.theme === cur);
+        });
+        $("#adminPanel").classList.remove("visible");
+        myNews = [];
+        chamberKeys = [];
+        renderHistory();
+      }
+    });
+
+    function renderUserArea(user) {
+      const name = user.displayName || user.email?.split("@")[0] || "User";
+      const initials = name.slice(0, 2).toUpperCase();
+      const photo = user.photoURL;
+      const avHtml = photo
+        ? `<div class="avatar"><img src="${escapeHtml(photo)}" alt="" referrerpolicy="no-referrer" /></div>`
+        : `<div class="avatar">${initials}</div>`;
+      const adminBadge = isAdmin(user) ? `<span class="chip" style="margin-right:4px">Admin</span>` : "";
+      const themeHtml = `<div class="theme-switcher" id="themeSwitcher" title="Theme">
+        <button type="button" class="theme-btn" data-theme="default" title="Default"></button>
+        <button type="button" class="theme-btn" data-theme="lite" title="Lite"></button>
+        <button type="button" class="theme-btn" data-theme="pink" title="Pink"></button>
+        <button type="button" class="theme-btn" data-theme="dark-pink" title="Dark pink"></button>
+        <button type="button" class="theme-btn" data-theme="red" title="Red"></button>
+      </div>`;
+      $("#userArea").innerHTML = `${themeHtml}${adminBadge}${avHtml}<button class="btn btn-ghost" id="logoutBtn">Sign out</button>`;
+      $("#logoutBtn").onclick = () => auth.signOut();
+      bindThemeButtons();
+      const cur = document.documentElement.getAttribute("data-theme") || "default";
+      document.querySelectorAll(".theme-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.theme === cur);
+      });
+    }
+
+    async function ensureUserProfile(user) {
+      const ref = db.collection("users").doc(user.uid);
+      const snap = await ref.get();
+      const base = {
+        email: user.email || "",
+        displayName: user.displayName || user.email?.split("@")[0] || "User",
+        photoURL: user.photoURL || "",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      };
+      if (!snap.exists) {
+        await ref.set({ ...base, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      } else {
+        await ref.set(base, { merge: true });
+      }
+    }
+
+    // ---------- Chamber (API keys in Firestore) ----------
+    async function loadChamberKeys() {
+      try {
+        let snap;
+        try {
+          snap = await db.collection("apiKeys").orderBy("createdAt", "asc").get();
+        } catch (_) {
+          // no index / missing createdAt — still load all keys
+          snap = await db.collection("apiKeys").get();
+        }
+        chamberKeys = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const saved = parseInt(localStorage.getItem("chamberIndex") || "0", 10);
+        chamberIndex = isNaN(saved) ? 0 : saved;
+        if (isAdmin(currentUser)) renderKeyList();
+        console.log("[chamber] loaded", chamberKeys.length, "keys,",
+          chamberKeys.filter((k) => k.active !== false && k.key).length, "active");
+      } catch (e) {
+        console.error("Chamber load:", e);
+        chamberKeys = [];
+        if (isAdmin(currentUser)) toast("Could not load API chamber — check Firestore rules");
+      }
+    }
+
+    function getActiveKeys() {
+      return chamberKeys.filter((k) => k.active !== false && k.key && String(k.key).trim().length > 10);
+    }
+
+    function getNextKey() {
+      const active = getActiveKeys();
+      if (!active.length) return null;
+      const pick = active[chamberIndex % active.length];
+      chamberIndex = (chamberIndex + 1) % active.length;
+      localStorage.setItem("chamberIndex", String(chamberIndex));
+      if (pick.id) {
+        db.collection("apiKeys").doc(pick.id).update({
+          useCount: firebase.firestore.FieldValue.increment(1),
+          lastUsedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }).catch(() => {});
+      }
+      return pick;
+    }
+
+    function renderKeyList() {
+      const list = $("#keyList");
+      if (!chamberKeys.length) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">No keys yet — add one above.</p>`;
+        return;
+      }
+      list.innerHTML = chamberKeys.map((k) => `
+        <div class="key-row" data-id="${escapeHtml(k.id)}">
+          <div>
+            <div class="masked">${escapeHtml(maskKey(k.key))} ${k.label ? "· " + escapeHtml(k.label) : ""}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">
+              uses: ${k.useCount || 0}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span class="badge ${k.active === false ? "off" : ""}">${k.active === false ? "off" : "active"}</span>
+            <button class="btn btn-sm btn-ghost toggle-key" data-id="${escapeHtml(k.id)}">${k.active === false ? "Enable" : "Disable"}</button>
+            <button class="btn btn-sm btn-danger del-key" data-id="${escapeHtml(k.id)}">Delete</button>
+          </div>
+        </div>
+      `).join("");
+
+      list.querySelectorAll(".toggle-key").forEach((btn) => {
+        btn.onclick = async () => {
+          const id = btn.dataset.id;
+          const item = chamberKeys.find((x) => x.id === id);
+          if (!item) return;
+          const next = item.active === false;
+          await db.collection("apiKeys").doc(id).update({ active: next });
+          item.active = next;
+          renderKeyList();
+          toast(next ? "Key enabled" : "Key disabled");
+        };
+      });
+      list.querySelectorAll(".del-key").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!confirm("Delete this key from the chamber?")) return;
+          await db.collection("apiKeys").doc(btn.dataset.id).delete();
+          chamberKeys = chamberKeys.filter((x) => x.id !== btn.dataset.id);
+          renderKeyList();
+          toast("Key removed");
+        };
+      });
+    }
+
+    $("#addKeyBtn").addEventListener("click", async () => {
+      if (!isAdmin(currentUser)) return;
+      const key = $("#newKeyInput").value.trim();
+      const label = $("#newKeyLabel").value.trim();
+      if (!key) { toast("Paste an API key"); return; }
+      // soft hint for aq / AIza style keys
+      if (key.length < 20) { toast("Key looks too short"); return; }
+      try {
+        const ref = await db.collection("apiKeys").add({
+          key,
+          label: label || "",
+          active: true,
+          useCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: currentUser.uid,
+        });
+        chamberKeys.push({ id: ref.id, key, label, active: true, useCount: 0 });
+        $("#newKeyInput").value = "";
+        $("#newKeyLabel").value = "";
+        renderKeyList();
+        toast("Key added to chamber");
+      } catch (e) {
+        console.error(e);
+        toast("Failed to add key: " + e.message);
+      }
+    });
+
+    // ---------- My news ----------
+    async function loadMyNews(uid) {
+      try {
+        const newsSnap = await db.collection("users").doc(uid).collection("news")
+          .orderBy("createdAt", "desc").limit(100).get();
+        myNews = newsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        renderHistory();
+      } catch (e) {
+        console.error(e);
+        toast("Could not load your news");
+      }
+    }
+
+    function renderHistory() {
+      const list = $("#historyList");
+      const countEl = $("#newsCount");
+      if (countEl) countEl.textContent = myNews.length ? `${myNews.length} saved` : "";
+      if (!myNews.length) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">No news yet — generate one above.</p>`;
+        return;
+      }
+      list.innerHTML = myNews.map((n) => {
+        const preview = (n.content || "").replace(/\s+/g, " ").slice(0, 140);
+        return `
+        <div class="history-item" data-id="${escapeHtml(n.id)}">
+          <div class="hi-top">
+            <span>${escapeHtml(n.date || "")} · ${escapeHtml(n.language || "")}</span>
+            <span>${n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString() : ""}</span>
+          </div>
+          <div class="hi-preview">${escapeHtml(preview)}${preview.length >= 140 ? "…" : ""}</div>
+        </div>`;
+      }).join("");
+      list.querySelectorAll(".history-item").forEach((el) => {
+        el.onclick = () => {
+          const item = myNews.find((x) => x.id === el.dataset.id);
+          if (item) showResult(item);
+        };
+      });
+    }
+
+    function showResult(item) {
+      const panel = $("#resultPanel");
+      panel.classList.add("visible");
+      $("#resultMeta").innerHTML = `
+        <span class="chip">${escapeHtml(item.date || "")}</span>
+        <span class="chip">${escapeHtml(item.language || "")}</span>
+      `;
+      $("#resultBody").innerHTML = formatNewsHtml(item.content || "");
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // ---------- Generate (uses chamber key) ----------
+    function buildNewsPrompt(dateStr, language) {
+      return `You are writing a factual daily news briefing for India for the date ${dateStr}.
+
+Use Google Search / current web information about REAL events reported by major Indian and international outlets (e.g. The Hindu, Indian Express, Times of India, NDTV, Hindustan Times, BBC, Reuters) on or around ${dateStr}. Prefer India-focused stories: politics, economy, courts, states, society, technology, business, weather/disasters, and major world news that day.
+
+Write the entire output in ${language} only.
+
+Use EXACTLY this structure and section titles (translate the section titles into ${language} if not English):
+
+Headlines
+
+Write 4–6 short news items. Prioritize real Indian national and regional news; include 1–2 major world items if important that day. Each item: one bold title line (**Title**), then 1–2 factual sentences under it. Do not invent events, names, or numbers.
+
+Sports news
+
+Write 2–4 real sports items from that period (cricket, football, olympics, other — whatever actually happened). Each item: one bold title line, then 1–2 sentences.
+
+Rules:
+- Base content on real reported events for ${dateStr} (or the closest available reporting if the exact day is sparse).
+- One page only. No extra sections, no intro title, no "DAILY NEWS BRIEFING", no closing summary.
+- Neutral, factual tone. ${language} only. Do not mention AI, search, or sources by name inside the briefing.
+- If a specific detail is uncertain, omit it rather than guessing.`;
+    }
+
+    async function callGeminiOnce(apiKey, model, prompt) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      // Try with Google Search grounding first (real news); fall back without tools if key/model rejects it
+      const bodies = [
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
+        },
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search_retrieval: {} }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
+        },
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
+        }
+      ];
+      let lastErr = null;
+      for (const body of bodies) {
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            const msg = data.error?.message || `HTTP ${res.status}`;
+            // tool not supported → try next body shape
+            if (/tool|google_search|not supported|unknown|invalid/i.test(msg) && body.tools) {
+              lastErr = new Error(msg);
+              continue;
+            }
+            const err = new Error(msg);
+            err.status = res.status;
+            err.raw = data;
+            throw err;
+          }
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!text) {
+            const block = data.candidates?.[0]?.finishReason || data.promptFeedback?.blockReason;
+            throw new Error(block ? `Blocked: ${block}` : "Empty response from model");
+          }
+          return text;
+        } catch (e) {
+          lastErr = e;
+          if (e.status && e.status !== 400) throw e;
+          if (!body.tools) throw e;
+        }
+      }
+      throw lastErr || new Error("Generation failed");
+    }
+
+    /** True when this key should be skipped and the next chamber key tried */
+    function isKeyOverOrBad(err) {
+      if (!err) return false;
+      const m = String(err.message || err || "").toLowerCase();
+      const status = err.status;
+      // quota / rate / exhausted
+      if (
+        m.includes("quota") || m.includes("rate") || m.includes("exhausted") ||
+        m.includes("resource_exhausted") || m.includes("resource exhausted") ||
+        m.includes("too many requests") || m.includes("limit") ||
+        m.includes("billing") || m.includes("overloaded") || m.includes("capacity") ||
+        status === 429 || status === 503
+      ) return true;
+      // bad / disabled / invalid key
+      if (
+        m.includes("api key") || m.includes("api_key") || m.includes("invalid") ||
+        m.includes("permission") || m.includes("denied") || m.includes("unauthorized") ||
+        m.includes("forbidden") || m.includes("not allowed") ||
+        status === 400 || status === 401 || status === 403
+      ) return true;
+      // model not available on this key → treat as key failure so we rotate
+      if (m.includes("not found") || m.includes("is not found") || status === 404) return true;
+      return false;
+    }
+
+    async function callGemini(apiKey, dateStr, language) {
+      const prompt = buildNewsPrompt(dateStr, language);
+      let lastErr = null;
+      for (const model of GEMINI_MODELS) {
+        try {
+          return await callGeminiOnce(apiKey, model, prompt);
+        } catch (e) {
+          lastErr = e;
+          const m = (e.message || "").toLowerCase();
+          // try next model if this one is missing / not supported for key
+          if (m.includes("not found") || m.includes("is not found") || m.includes("unsupported") || e.status === 404) {
+            console.warn("[gemini] model failed, trying next:", model, e.message);
+            continue;
+          }
+          // invalid key / quota — don't waste other models on same key; rotate chamber instead
+          throw e;
+        }
+      }
+      throw lastErr || new Error("All models failed");
+    }
+
+    async function generateWithChamber(dateStr, language) {
+      const active = getActiveKeys();
+      if (!active.length) {
+        const err = new Error(isAdmin(currentUser)
+          ? "Chamber is empty — add an API key in Admin"
+          : "Please try the service by jovial tomorrow");
+        err.code = "NO_KEYS";
+        throw err;
+      }
+
+      // Round-robin: start at chamberIndex, try every active key until one works
+      let lastErr = null;
+      const n = active.length;
+      const start = ((chamberIndex % n) + n) % n;
+
+      for (let i = 0; i < n; i++) {
+        const idx = (start + i) % n;
+        const pick = active[idx];
+        const label = pick.label || maskKey(pick.key);
+
+        if (i > 0) {
+          const loadingEl = $("#loadingText");
+          if (loadingEl) loadingEl.textContent = `Key over — trying next (${i + 1}/${n})…`;
+          console.warn("[chamber] switching to next key:", label);
+        }
+
+        try {
+          const text = await callGemini(pick.key, dateStr, language);
+          // success → advance past this key for next generate (fair rotation)
+          chamberIndex = (idx + 1) % n;
+          localStorage.setItem("chamberIndex", String(chamberIndex));
+          if (pick.id) {
+            db.collection("apiKeys").doc(pick.id).update({
+              useCount: firebase.firestore.FieldValue.increment(1),
+              lastUsedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            }).catch(() => {});
+          }
+          if (i > 0) toast("Switched API key — generated OK");
+          return text;
+        } catch (e) {
+          lastErr = e;
+          console.warn("[chamber] key failed:", label, e.message || e);
+
+          // Always move index past a failed key so the next request starts on a fresh one
+          chamberIndex = (idx + 1) % n;
+          localStorage.setItem("chamberIndex", String(chamberIndex));
+
+          // Quota / invalid / rate limit → try next key in chamber
+          if (isKeyOverOrBad(e) && i < n - 1) {
+            continue;
+          }
+          // Last key, or non-key error with no more keys to try
+          if (i < n - 1) {
+            // still try next key for unknown errors (network blips, etc.)
+            continue;
+          }
+        }
+      }
+
+      const err = lastErr || new Error("Generation failed");
+      const msg = String(err.message || "");
+      if (isKeyOverOrBad(err) || /quota|rate|exhausted|api key/i.test(msg)) {
+        err.message = isAdmin(currentUser)
+          ? "All API keys in the chamber failed (quota / invalid). Add or enable more keys."
+          : "Please try the service by jovial tomorrow";
+        err.code = "ALL_KEYS_FAILED";
+      }
+      throw err;
+    }
+
+    $("#viewAllBtn").addEventListener("click", () => {
+      const panel = $("#historyPanel");
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      panel.style.boxShadow = "0 0 0 2px rgba(124,156,255,0.45), var(--shadow)";
+      setTimeout(() => { panel.style.boxShadow = ""; }, 1200);
+      if (!myNews.length) toast("No news yet — generate one first");
+    });
+
+    $("#generateBtn").addEventListener("click", async () => {
+      if (!currentUser || isGenerating) return;
+      const dateStr = $("#dateInput").value;
+      const language = $("#langInput").value;
+      if (!dateStr) { toast("Pick a date"); return; }
+
+      // refresh chamber right before generate (in case admin added keys)
+      await loadChamberKeys();
+
+      isGenerating = true;
+      $("#generateBtn").disabled = true;
+      if ($("#viewAllBtn")) $("#viewAllBtn").disabled = true;
+      $("#loadingRow").classList.add("show");
+      $("#loadingText").textContent = "Generating…";
+
+      try {
+        const content = await generateWithChamber(dateStr, language);
+        const docRef = await db.collection("users").doc(currentUser.uid).collection("news").add({
+          date: dateStr,
+          language,
+          content,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ownerUid: currentUser.uid,
+          ownerEmail: currentUser.email || "",
+        });
+        const item = { id: docRef.id, date: dateStr, language, content, createdAt: { toDate: () => new Date() } };
+        myNews.unshift(item);
+        renderHistory();
+        showResult(item);
+        toast("News generated & saved");
+        if (isAdmin(currentUser)) await loadAdminUsers();
+      } catch (e) {
+        console.error(e);
+        const msg = e.message || "Generation failed";
+        if (
+          e.code === "NO_KEYS" || e.code === "ALL_KEYS_FAILED" ||
+          msg.includes("jovial tomorrow") || msg.includes("Chamber is empty") ||
+          msg.includes("All API keys")
+        ) {
+          toast(msg, 4500);
+        } else if (/api key|invalid|permission denied|quota|exhausted|rate/i.test(msg)) {
+          toast(isAdmin(currentUser)
+            ? "API key problem — chamber will try other keys next time. Check Admin."
+            : "Please try the service by jovial tomorrow", 4500);
+        } else {
+          toast(msg, 4500);
+        }
+      } finally {
+        isGenerating = false;
+        $("#generateBtn").disabled = false;
+        $("#viewAllBtn").disabled = false;
+        $("#loadingRow").classList.remove("show");
+      }
+    });
+
+    // ---------- Admin: download user profile photo ----------
+    async function downloadProfilePhoto(url, name) {
+      if (!url) { toast("No photo"); return; }
+      const filename = `${name || "profile"}.jpg`;
+      try {
+        // try fetch → blob (works if CORS allows, e.g. some CDNs)
+        const res = await fetch(url, { mode: "cors", referrerPolicy: "no-referrer" });
+        if (!res.ok) throw new Error("fetch failed");
+        const blob = await res.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        toast("Photo downloaded");
+      } catch (_) {
+        // Google avatars often block CORS — open in new tab so admin can save
+        window.open(url, "_blank", "noopener,noreferrer");
+        toast("Opened photo in new tab — right‑click → Save image");
+      }
+    }
+
+    // ---------- Admin users ----------
+    async function loadAdminUsers() {
+      const list = $("#adminList");
+      list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">Loading…</p>`;
+      try {
+        const usersSnap = await db.collection("users").get();
+        if (usersSnap.empty) {
+          list.innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem;">No users yet.</p>`;
+          return;
+        }
+        const blocks = [];
+        for (const uDoc of usersSnap.docs) {
+          const u = uDoc.data();
+          const newsSnap = await db.collection("users").doc(uDoc.id).collection("news")
+            .orderBy("createdAt", "desc").limit(10).get();
+          const newsItems = newsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          const photo = u.photoURL
+            ? `<img class="av" src="${escapeHtml(u.photoURL)}" alt="" referrerpolicy="no-referrer" />`
+            : `<div class="av" style="display:grid;place-items:center;font-size:0.8rem;font-weight:600;">${escapeHtml((u.displayName || "?").slice(0, 2).toUpperCase())}</div>`;
+          const safeName = (u.displayName || u.email || "user").replace(/[^\w.-]+/g, "_").slice(0, 40);
+          const dlBtn = u.photoURL
+            ? `<button type="button" class="btn btn-sm dl-photo" data-url="${escapeHtml(u.photoURL)}" data-name="${escapeHtml(safeName)}">Download photo</button>`
+            : `<span style="font-size:0.75rem;color:var(--text-muted);">No photo</span>`;
+          const newsHtml = newsItems.length
+            ? `<div class="admin-news-list">${newsItems.map((n) =>
+                `<div class="admin-news-item" data-content="${escapeHtml(n.content || "")}">
+                  <strong>${escapeHtml(n.date || "")}</strong> · ${escapeHtml(n.language || "")}<br/>
+                  <span style="color:var(--text-muted)">${escapeHtml((n.content || "").slice(0, 80))}…</span>
+                </div>`
+              ).join("")}</div>`
+            : `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">No news yet</p>`;
+          blocks.push(`
+            <div class="admin-user">
+              ${photo}
+              <div class="info">
+                <div class="name">${escapeHtml(u.displayName || "User")}</div>
+                <div class="email">${escapeHtml(u.email || uDoc.id)}</div>
+                <div class="news-count">${newsItems.length} recent news item(s) · only this user’s history</div>
+                <div style="margin:6px 0 4px;">${dlBtn}</div>
+                ${newsHtml}
+              </div>
+            </div>
+          `);
+        }
+        list.innerHTML = blocks.join("");
+        list.querySelectorAll(".admin-news-item").forEach((el) => {
+          el.onclick = () => {
+            $("#resultPanel").classList.add("visible");
+            $("#resultMeta").innerHTML = `<span class="chip">Admin preview</span>`;
+            $("#resultBody").innerHTML = formatNewsHtml(el.getAttribute("data-content") || "");
+            $("#resultPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+          };
+        });
+        list.querySelectorAll(".dl-photo").forEach((btn) => {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            downloadProfilePhoto(btn.dataset.url, btn.dataset.name || "profile");
+          };
+        });
+      } catch (e) {
+        console.error(e);
+        list.innerHTML = `<p style="color:var(--danger);font-size:0.85rem;">${escapeHtml(e.message)}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
