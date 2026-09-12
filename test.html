@@ -247,6 +247,68 @@
     .gen-panel { padding: 24px; }
     .gen-panel h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
     .gen-panel .hint { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+    /* Main app — Kexsio / Plasma shell when logged in */
+    body.app-ready .scene { opacity: 0.35; }
+    #appPlasma {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    body.app-ready #appPlasma { opacity: 1; }
+    #appPlasma canvas { display: block; width: 100%; height: 100%; }
+    body.app-ready {
+      background: #05030a;
+    }
+    body.app-ready #app {
+      position: relative;
+      z-index: 1;
+    }
+    body.app-ready .header.glass,
+    body.app-ready .gen-panel.glass,
+    body.app-ready .result-panel.glass,
+    body.app-ready .history-panel.glass,
+    body.app-ready .admin-panel.glass {
+      background: linear-gradient(145deg, rgba(18, 13, 23, 0.82), rgba(4, 4, 6, 0.68));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+    }
+    body.app-ready .gen-panel h2 {
+      background: linear-gradient(180deg, #fff, rgba(255,255,255,0.75));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    body.app-ready .btn-primary {
+      background: #fff;
+      color: #0a080f;
+      border-color: transparent;
+      font-weight: 650;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+    }
+    body.app-ready .btn-primary:hover:not(:disabled) {
+      background: #f5f2ff;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.35), 0 0 24px rgba(200,160,255,0.2);
+    }
+    body.app-ready .field input,
+    body.app-ready .field select {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.1);
+    }
+    body.app-ready .field input:focus,
+    body.app-ready .field select:focus {
+      border-color: rgba(200,150,255,0.45);
+      box-shadow: 0 0 0 3px rgba(180,120,255,0.12);
+    }
     .gen-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
     }
@@ -579,6 +641,79 @@
     .smudge-login:active {
       transform: translateX(-50%) scale(0.97);
     }
+    .smudge-perf {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      z-index: 20;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(240,236,228,0.35);
+      background: rgba(0,0,0,0.35);
+      color: #f0ece4;
+      cursor: pointer;
+      mix-blend-mode: difference;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .smudge-perf:hover {
+      background: rgba(240,236,228,0.15);
+      border-color: #f0ece4;
+    }
+    .smudge-perf.on {
+      background: #f0ece4;
+      color: #0a0a0a;
+      mix-blend-mode: normal;
+    }
+    body.low-perf #appPlasma,
+    body.low-perf .plasma-home,
+    body.low-perf .smudge-svg,
+    body.low-perf .smudge-bg,
+    body.low-perf .kx-runners,
+    body.low-perf .kx-orb,
+    body.low-perf .kx-halo,
+    body.low-perf .kx-noise,
+    body.low-perf .kx-grid,
+    body.low-perf .kx-pointer-glow,
+    body.low-perf .blob,
+    body.low-perf .scene {
+      display: none !important;
+    }
+    body.low-perf .smudge-root,
+    body.low-perf .smudge-fg {
+      background: #0a0a0a;
+    }
+    body.low-perf .header.glass,
+    body.low-perf .gen-panel.glass,
+    body.low-perf .result-panel.glass,
+    body.low-perf .history-panel.glass,
+    body.low-perf .admin-panel.glass {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: #12141c !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
+    }
+    body.low-perf .kx-page { background: #121018 !important; }
+    body.low-perf .kx-tilt { transform: none !important; transition: none !important; }
+    body.low-perf .kx-card {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    body.low-perf * { animation: none !important; }
+    .header-perf-btn {
+      font-size: 0.7rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .header-perf-btn.on {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
     /* ── Kexsio-style auth card ── */
     #authOverlay.overlay {
@@ -894,6 +1029,7 @@
       </mask>
     </svg>
     <button type="button" class="smudge-login" id="smudgeLoginBtn">Log in</button>
+    <button type="button" class="smudge-perf" id="lowPerfBtn" title="Disable heavy visual effects">Low performance mode</button>
   </section>
 
   <div class="scene" aria-hidden="true">
@@ -901,6 +1037,9 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
+
+  <!-- Plasma behind main app (logged-in) -->
+  <div id="appPlasma" aria-hidden="true"></div>
 
   <div id="app">
     <header class="header glass">
@@ -1409,8 +1548,23 @@
       }
     }
 
-    $("#googleBtn").addEventListener("click", () => {
-      signInWithProvider(new firebase.auth.GoogleAuthProvider());
+    function bindGoogleBtn() {
+      const gBtn = document.getElementById("googleBtn");
+      if (!gBtn || gBtn.dataset.bound) return;
+      gBtn.dataset.bound = "1";
+      gBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        signInWithProvider(new firebase.auth.GoogleAuthProvider());
+      });
+    }
+    bindGoogleBtn();
+    // Re-bind if auth UI is re-rendered later
+    document.addEventListener("click", (e) => {
+      const t = e.target && e.target.closest && e.target.closest("#googleBtn");
+      if (t && !t.dataset.listening) {
+        // primary handler already on element; this is a safety net
+      }
     });
 
     auth.getRedirectResult().catch(() => {});
@@ -1452,6 +1606,7 @@
     auth.onAuthStateChanged(async (user) => {
       currentUser = user;
       if (user) {
+        document.body.classList.add("app-ready");
         $("#authOverlay").classList.add("hidden");
         $("#generateBtn").disabled = false;
         $("#viewAllBtn").disabled = false;
@@ -1461,6 +1616,7 @@
         await loadChamberKeys();
         updateStaffPanel();
       } else {
+        document.body.classList.remove("app-ready");
         currentRole = "user";
         // Smudge homescreen is the entry; auth opens only via Log in button
         $("#authOverlay").classList.add("hidden");
@@ -1503,8 +1659,15 @@
         <button type="button" class="theme-btn" data-theme="dark-pink" title="Dark pink"></button>
         <button type="button" class="theme-btn" data-theme="red" title="Red"></button>
       </div>`;
-      $("#userArea").innerHTML = `${themeHtml}${badge}${avHtml}<button class="btn btn-ghost" id="logoutBtn">Sign out</button>`;
+      const perfHtml = `<button type="button" class="btn btn-ghost header-perf-btn" id="headerPerfBtn" title="Open lightweight version">Low perf</button>`;
+      $("#userArea").innerHTML = `${themeHtml}${perfHtml}${badge}${avHtml}<button class="btn btn-ghost" id="logoutBtn">Sign out</button>`;
       $("#logoutBtn").onclick = () => auth.signOut();
+      const hPerf = $("#headerPerfBtn");
+      if (hPerf) {
+        hPerf.onclick = () => {
+          window.location.href = "https://news-sh.github.io/low";
+        };
+      }
       bindThemeButtons();
       const cur = document.documentElement.getAttribute("data-theme") || "default";
       document.querySelectorAll(".theme-btn").forEach((b) => {
@@ -2177,18 +2340,17 @@ void main() {
     return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
   }
 
-  const containerEl = document.getElementById('plasmaHome');
-  if (!containerEl) { /* skip */ }
-  else {
-    const color = '#7c9cff';
-    const speed = 0.9;
-    const direction = 'forward';
-    const scale = 1.15;
-    const opacity = 0.85;
-    const mouseInteractive = true;
-    const useCustomColor = 1.0;
+  function initPlasma(containerId, opts = {}) {
+    const containerEl = document.getElementById(containerId);
+    if (!containerEl || containerEl.dataset.plasmaInit) return;
+    containerEl.dataset.plasmaInit = '1';
+
+    const color = opts.color || '#9c56ff';
+    const speed = opts.speed ?? 0.85;
+    const scale = opts.scale ?? 1.2;
+    const opacity = opts.opacity ?? 0.75;
+    const mouseInteractive = opts.mouseInteractive !== false;
     const customColorRgb = hexToRgb(color);
-    const directionMultiplier = direction === 'reverse' ? -1.0 : 1.0;
 
     let renderer;
     try {
@@ -2200,97 +2362,101 @@ void main() {
       });
     } catch (e) {
       console.warn('[plasma] WebGL init failed', e);
+      return;
     }
 
-    if (renderer) {
-      const gl = renderer.gl;
-      const canvas = gl.canvas;
-      canvas.style.display = 'block';
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      containerEl.appendChild(canvas);
+    const gl = renderer.gl;
+    const canvas = gl.canvas;
+    canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    containerEl.appendChild(canvas);
 
-      const geometry = new Triangle(gl);
-      const program = new Program(gl, {
-        vertex,
-        fragment,
-        uniforms: {
-          iTime: { value: 0 },
-          iResolution: { value: new Float32Array([1, 1]) },
-          uCustomColor: { value: new Float32Array(customColorRgb) },
-          uUseCustomColor: { value: useCustomColor },
-          uSpeed: { value: speed * 0.4 },
-          uDirection: { value: directionMultiplier },
-          uScale: { value: scale },
-          uOpacity: { value: opacity },
-          uMouse: { value: new Float32Array([0, 0]) },
-          uMouseInteractive: { value: mouseInteractive ? 1.0 : 0.0 }
-        }
-      });
-      const mesh = new Mesh(gl, { geometry, program });
+    const geometry = new Triangle(gl);
+    const program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        iTime: { value: 0 },
+        iResolution: { value: new Float32Array([1, 1]) },
+        uCustomColor: { value: new Float32Array(customColorRgb) },
+        uUseCustomColor: { value: 1.0 },
+        uSpeed: { value: speed * 0.4 },
+        uDirection: { value: 1.0 },
+        uScale: { value: scale },
+        uOpacity: { value: opacity },
+        uMouse: { value: new Float32Array([0, 0]) },
+        uMouseInteractive: { value: mouseInteractive ? 1.0 : 0.0 }
+      }
+    });
+    const mesh = new Mesh(gl, { geometry, program });
 
-      const handleMouseMove = (e) => {
-        if (!mouseInteractive) return;
-        const rect = containerEl.getBoundingClientRect();
-        const mouseUniform = program.uniforms.uMouse.value;
-        mouseUniform[0] = e.clientX - rect.left;
-        mouseUniform[1] = e.clientY - rect.top;
-      };
-      // Track on whole smudge root so interaction feels natural
-      const root = document.getElementById('smudgeRoot') || containerEl;
-      if (mouseInteractive) root.addEventListener('mousemove', handleMouseMove);
+    const handleMouseMove = (e) => {
+      if (!mouseInteractive) return;
+      const rect = containerEl.getBoundingClientRect();
+      const mouseUniform = program.uniforms.uMouse.value;
+      mouseUniform[0] = e.clientX - rect.left;
+      mouseUniform[1] = e.clientY - rect.top;
+    };
+    const moveTarget = opts.moveRoot
+      ? (document.getElementById(opts.moveRoot) || containerEl)
+      : (document.getElementById('smudgeRoot') || document.body);
+    if (mouseInteractive) moveTarget.addEventListener('mousemove', handleMouseMove);
 
-      const setSize = () => {
-        const rect = containerEl.getBoundingClientRect();
-        const width = Math.max(1, Math.floor(rect.width));
-        const height = Math.max(1, Math.floor(rect.height));
-        renderer.setSize(width, height);
-        const res = program.uniforms.iResolution.value;
-        res[0] = gl.drawingBufferWidth;
-        res[1] = gl.drawingBufferHeight;
-      };
-      const ro = new ResizeObserver(setSize);
-      ro.observe(containerEl);
-      setSize();
+    const setSize = () => {
+      const rect = containerEl.getBoundingClientRect();
+      const width = Math.max(1, Math.floor(rect.width));
+      const height = Math.max(1, Math.floor(rect.height));
+      renderer.setSize(width, height);
+      const res = program.uniforms.iResolution.value;
+      res[0] = gl.drawingBufferWidth;
+      res[1] = gl.drawingBufferHeight;
+    };
+    const ro = new ResizeObserver(setSize);
+    ro.observe(containerEl);
+    setSize();
 
-      let raf = 0;
-      let contextLost = false;
-      let isVisible = true;
-      const t0 = performance.now();
+    let raf = 0;
+    let contextLost = false;
+    let isVisible = true;
+    const t0 = performance.now();
 
-      const loop = (t) => {
-        if (contextLost || !isVisible) return;
-        const timeValue = (t - t0) * 0.001;
-        program.uniforms.iTime.value = timeValue;
-        renderer.render({ scene: mesh });
-        raf = requestAnimationFrame(loop);
-      };
-
-      canvas.addEventListener('webglcontextlost', (e) => {
-        e.preventDefault();
-        contextLost = true;
-        cancelAnimationFrame(raf);
-      });
-      canvas.addEventListener('webglcontextrestored', () => {
-        contextLost = false;
-        if (isVisible) {
-          cancelAnimationFrame(raf);
-          raf = requestAnimationFrame(loop);
-        }
-      });
-
-      const io = new IntersectionObserver(([entry]) => {
-        const wasVisible = isVisible;
-        isVisible = entry.isIntersecting;
-        if (isVisible && !wasVisible && !contextLost) {
-          cancelAnimationFrame(raf);
-          raf = requestAnimationFrame(loop);
-        }
-      }, { threshold: 0 });
-      io.observe(containerEl);
+    const loop = (t) => {
+      if (contextLost || !isVisible) return;
+      program.uniforms.iTime.value = (t - t0) * 0.001;
+      renderer.render({ scene: mesh });
       raf = requestAnimationFrame(loop);
-    }
+    };
+
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      contextLost = true;
+      cancelAnimationFrame(raf);
+    });
+    canvas.addEventListener('webglcontextrestored', () => {
+      contextLost = false;
+      if (isVisible) {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(loop);
+      }
+    });
+
+    const io = new IntersectionObserver(([entry]) => {
+      const wasVisible = isVisible;
+      isVisible = entry.isIntersecting;
+      if (isVisible && !wasVisible && !contextLost) {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(loop);
+      }
+    }, { threshold: 0 });
+    io.observe(containerEl);
+    raf = requestAnimationFrame(loop);
   }
+
+  // Homescreen plasma
+  initPlasma('plasmaHome', { color: '#7c9cff', opacity: 0.85, scale: 1.15, moveRoot: 'smudgeRoot' });
+  // Main app plasma (behind generate UI when logged in)
+  initPlasma('appPlasma', { color: '#9c56ff', opacity: 0.55, scale: 1.25, mouseInteractive: true, moveRoot: null });
   </script>
 
   <!-- Smudge Reveal engine -->
@@ -2404,8 +2570,39 @@ void main() {
     }
     if (!prefersReduced) rafId = requestAnimationFrame(loop);
 
+    // ── Low performance mode → lightweight site ──
+    const perfBtn = document.getElementById("lowPerfBtn");
+    if (perfBtn) {
+      perfBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.location.href = "https://news-sh.github.io/low";
+      });
+    }
+
+    function focusGeneratePanel() {
+      const panel = document.getElementById("genPanel");
+      if (!panel) return;
+      panel.classList.remove("minimized");
+      const minBtn = panel.querySelector(".min-btn");
+      if (minBtn) {
+        minBtn.textContent = "−";
+        minBtn.title = "Minimize";
+      }
+      setTimeout(() => {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    }
+
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
+        // If already signed in, go to Generate instead of auth
+        try {
+          if (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser) {
+            root.classList.add("hidden");
+            focusGeneratePanel();
+            return;
+          }
+        } catch (_) {}
         const overlay = document.getElementById("authOverlay");
         if (overlay) overlay.classList.remove("hidden");
       });
@@ -2416,8 +2613,15 @@ void main() {
         root.classList.add("hidden");
         const overlay = document.getElementById("authOverlay");
         if (overlay) overlay.classList.add("hidden");
+        // After login → show Generate UI (not login)
+        if (loginBtn) {
+          loginBtn.textContent = "Generate";
+          loginBtn.classList.add("visible");
+        }
+        focusGeneratePanel();
       } else {
         root.classList.remove("hidden");
+        if (loginBtn) loginBtn.textContent = "Log in";
       }
     }
 
@@ -2436,7 +2640,8 @@ void main() {
       }, 200);
       setTimeout(() => clearInterval(t), 5000);
     }
-  })();
+
+    })();
   </script>
 
 </body></html>
