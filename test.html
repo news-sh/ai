@@ -151,9 +151,16 @@
       transition: background 0.4s ease;
     }
     .blob {
-      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55;
-      animation: float 18s ease-in-out infinite; will-change: transform;
+      position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.4;
+      animation: float 22s ease-in-out infinite;
       transition: background 0.4s ease;
+      contain: strict;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .blob { animation: none !important; }
+    }
+    @media (max-width: 700px) {
+      .blob { display: none; }
     }
     .blob-1 { width: 42vw; height: 42vw; max-width: 520px; max-height: 520px; background: var(--blob-1); top: -10%; left: -8%; }
     .blob-2 { width: 36vw; height: 36vw; max-width: 440px; max-height: 440px; background: var(--blob-2); top: 20%; right: -12%; animation-delay: -6s; animation-duration: 22s; }
@@ -165,16 +172,26 @@
     }
     .glass {
       background: var(--glass);
-      backdrop-filter: blur(var(--blur)) saturate(160%);
-      -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+      backdrop-filter: blur(12px) saturate(140%);
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
       box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 rgba(0,0,0,0.2);
     }
     .glass-strong {
       background: var(--glass-strong);
-      backdrop-filter: blur(32px) saturate(180%);
-      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+    }
+    @media (max-width: 700px) {
+      .glass, .glass-strong {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(12, 14, 22, 0.92);
+      }
+      [data-theme="lite"] .glass, [data-theme="lite"] .glass-strong {
+        background: rgba(255, 255, 255, 0.94);
+      }
     }
     #app {
       position: relative; z-index: 1; max-width: 960px; margin: 0 auto;
@@ -271,14 +288,17 @@
     body.app-ready .result-panel.glass,
     body.app-ready .history-panel.glass,
     body.app-ready .admin-panel.glass {
-      background: linear-gradient(145deg, rgba(18, 13, 23, 0.82), rgba(4, 4, 6, 0.68));
+      background: linear-gradient(145deg, rgba(18, 13, 23, 0.9), rgba(8, 6, 14, 0.88));
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow:
-        0 24px 80px rgba(0, 0, 0, 0.45),
+        0 16px 48px rgba(0, 0, 0, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      /* lighter blur when logged in — plasma already costs GPU */
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
     }
+    /* hide CSS scene blobs when plasma / app is active */
+    body.app-ready .scene { display: none; }
     body.app-ready .gen-panel h2 {
       background: linear-gradient(180deg, #fff, rgba(255,255,255,0.75));
       -webkit-background-clip: text;
@@ -1019,7 +1039,7 @@
     <svg class="smudge-svg" id="smudgeSvg" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <filter id="kx-smudge-goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="25" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
           <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 60 -14" />
         </filter>
       </defs>
@@ -2362,7 +2382,8 @@ void main() {
         webgl: 2,
         alpha: true,
         antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 2)
+        // Cap DPR hard — biggest FPS win on retina screens
+        dpr: Math.min(window.devicePixelRatio || 1, 1)
       });
     } catch (e) {
       console.warn('[plasma] WebGL init failed', e);
@@ -2425,56 +2446,75 @@ void main() {
     let isVisible = true;
     const t0 = performance.now();
 
+    let pageVisible = !document.hidden;
+    // ~30fps throttle — halves GPU load vs uncapped 60fps
+    let lastFrame = 0;
+    const FRAME_MS = 33;
+
     const loop = (t) => {
-      if (contextLost || !isVisible) return;
+      raf = requestAnimationFrame(loop);
+      if (contextLost || !isVisible || !pageVisible) return;
+      if (t - lastFrame < FRAME_MS) return;
+      lastFrame = t;
       program.uniforms.iTime.value = (t - t0) * 0.001;
       renderer.render({ scene: mesh });
-      raf = requestAnimationFrame(loop);
     };
 
     canvas.addEventListener('webglcontextlost', (e) => {
       e.preventDefault();
       contextLost = true;
-      cancelAnimationFrame(raf);
     });
     canvas.addEventListener('webglcontextrestored', () => {
       contextLost = false;
-      if (isVisible) {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(loop);
-      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      pageVisible = !document.hidden;
     });
 
     const io = new IntersectionObserver(([entry]) => {
-      const wasVisible = isVisible;
       isVisible = entry.isIntersecting;
-      if (isVisible && !wasVisible && !contextLost) {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(loop);
-      }
     }, { threshold: 0 });
     io.observe(containerEl);
     raf = requestAnimationFrame(loop);
+
+    // Expose destroy so we can kill plasma after login
+    containerEl.__plasmaStop = () => {
+      cancelAnimationFrame(raf);
+      isVisible = false;
+      try { canvas.remove(); } catch (_) {}
+    };
   }
 
-  // Homescreen plasma
-  initPlasma('plasmaHome', { color: '#7c9cff', opacity: 0.85, scale: 1.15, moveRoot: 'smudgeRoot' });
-  // Main app plasma (behind generate UI when logged in)
-  initPlasma('appPlasma', { color: '#9c56ff', opacity: 0.55, scale: 1.25, mouseInteractive: true, moveRoot: null });
+  // Only homescreen plasma (app plasma was a major lag source)
+  const isMobile = window.matchMedia('(max-width: 700px)').matches
+    || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!isMobile) {
+    initPlasma('plasmaHome', {
+      color: '#7c9cff',
+      opacity: 0.7,
+      scale: 1.35,
+      mouseInteractive: false,
+      moveRoot: 'smudgeRoot'
+    });
+  }
+  // appPlasma intentionally NOT started — solid dark bg is enough when logged in
   </script>
 
   <!-- Smudge Reveal engine -->
   <script>
   (function () {
-    const SMOOTHING = 0.1;
-    const SPEED_THRESHOLD = 0.01;
-    const SIZE_FROM_SPEED = 0.2;
-    const EXPAND_MULT = 2;
-    const EXPAND_MS = 2000;
-    const DISSOLVE_START = 2000;
-    const DISSOLVE_MS = 3000;
+    const SMOOTHING = 0.18;
+    const SPEED_THRESHOLD = 1.2;
+    const SIZE_FROM_SPEED = 0.22;
+    // Bigger holes that stay open longer so background text is readable
+    const EXPAND_MULT = 3.2;
+    const EXPAND_MS = 2800;
+    const DISSOLVE_START = 5500;
+    const DISSOLVE_MS = 4000;
     const TOTAL_LIFE = DISSOLVE_START + DISSOLVE_MS;
-    const LOGIN_AFTER_MOVES = 8;
+    const LOGIN_AFTER_MOVES = 5;
+    const MAX_BLOBS = 14;
 
     function smoothstep(t) {
       const c = Math.max(0, Math.min(1, t));
@@ -2529,6 +2569,11 @@ void main() {
     }, { passive: false });
 
     function stampBlob(cx, cy, r) {
+      // Cap active circles so SVG filter doesn't explode CPU
+      while (blobs.length >= MAX_BLOBS) {
+        const old = blobs.shift();
+        try { old.el.remove(); } catch (_) {}
+      }
       const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       circle.setAttribute("fill", "#fff");
       container.prepend(circle);
@@ -2541,6 +2586,17 @@ void main() {
       }
     }
 
+    function stopSmudgeEngine() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+      while (blobs.length) {
+        const b = blobs.pop();
+        try { b.el.remove(); } catch (_) {}
+      }
+      const plasmaEl = document.getElementById("plasmaHome");
+      if (plasmaEl && plasmaEl.__plasmaStop) plasmaEl.__plasmaStop();
+    }
+
     function loop() {
       const now = performance.now();
       if (started) {
@@ -2548,7 +2604,7 @@ void main() {
         smooth.y += (pointer.y - smooth.y) * SMOOTHING;
         const speed = Math.hypot(pointer.x - smooth.x, pointer.y - smooth.y);
         if (speed > SPEED_THRESHOLD) {
-          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, 8));
+          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, 28));
         }
       }
       for (let i = blobs.length - 1; i >= 0; i--) {
@@ -2561,7 +2617,11 @@ void main() {
         }
         let r;
         if (elapsed < EXPAND_MS) {
-          r = b.baseRadius + b.baseRadius * smoothstep(elapsed / EXPAND_MS);
+          // grow from base → base * EXPAND_MULT
+          r = b.baseRadius * (1 + (EXPAND_MULT - 1) * smoothstep(elapsed / EXPAND_MS));
+        } else if (elapsed < DISSOLVE_START) {
+          // hold fully open so text stays readable
+          r = b.baseRadius * EXPAND_MULT;
         } else {
           const t2 = (elapsed - DISSOLVE_START) / DISSOLVE_MS;
           r = b.baseRadius * EXPAND_MULT * (1 - power3in(Math.max(0, Math.min(1, t2))));
@@ -2615,9 +2675,9 @@ void main() {
     function syncSmudgeWithAuth(user) {
       if (user) {
         root.classList.add("hidden");
+        stopSmudgeEngine();
         const overlay = document.getElementById("authOverlay");
         if (overlay) overlay.classList.add("hidden");
-        // After login → show Generate UI (not login)
         if (loginBtn) {
           loginBtn.textContent = "Generate";
           loginBtn.classList.add("visible");
