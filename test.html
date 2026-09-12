@@ -1022,6 +1022,118 @@
       .kx-card { padding: 24px 20px; border-radius: 22px; }
       .kx-card-shell, .kx-runners { border-radius: 23px; }
     }
+
+    /* ── Mobile support ── */
+    @media (max-width: 700px) {
+      html, body {
+        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
+      }
+      #app {
+        padding: 12px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        gap: 12px;
+        max-width: 100%;
+      }
+      .header {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 12px;
+        padding-top: max(10px, env(safe-area-inset-top));
+      }
+      .brand h1 { font-size: 1rem; }
+      .brand span { font-size: 0.65rem; }
+      .user-area {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+      .btn { min-height: 40px; padding: 8px 14px; font-size: 0.82rem; }
+      .btn-lg { min-height: 48px; padding: 12px 18px; width: 100%; }
+      .gen-panel, .result-panel, .history-panel, .admin-panel {
+        padding: 16px;
+        border-radius: 16px;
+      }
+      .gen-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .gen-actions .btn-primary,
+      .gen-actions .btn-lg {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+      }
+      .field input, .field select {
+        font-size: 16px; /* prevents iOS zoom on focus */
+        min-height: 48px;
+      }
+      .smudge-brand {
+        top: max(1rem, env(safe-area-inset-top));
+        left: 1rem;
+        font-size: 0.65rem;
+      }
+      .smudge-perf {
+        top: max(1rem, env(safe-area-inset-top));
+        right: 1rem;
+        font-size: 0.55rem;
+        padding: 6px 10px;
+      }
+      .smudge-hint {
+        bottom: max(6.5rem, calc(env(safe-area-inset-bottom) + 5.5rem));
+        font-size: 0.75rem;
+        padding: 0 1.25rem;
+        text-align: center;
+      }
+      .smudge-fg, .smudge-bg {
+        padding: 1.5rem 1.25rem;
+        padding-bottom: max(2rem, env(safe-area-inset-bottom) + 1rem);
+        align-items: flex-end;
+      }
+      .smudge-fg h1 {
+        font-size: clamp(2.4rem, 16vw, 4.5rem);
+        line-height: 0.95;
+      }
+      .smudge-bg p {
+        font-size: clamp(0.85rem, 3.8vw, 1.1rem);
+        max-width: 22ch;
+      }
+      .smudge-login {
+        bottom: max(1.5rem, env(safe-area-inset-bottom) + 1rem);
+        min-height: 48px;
+        padding: 12px 28px;
+        font-size: 0.8rem;
+      }
+      .kx-page {
+        padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+        align-items: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .kx-stage { width: 100%; max-width: 100%; }
+      .kx-tilt { transform: none !important; }
+      .kx-runners { display: none; }
+      .kx-field, .kx-sign-in, .kx-google {
+        height: 48px;
+        min-height: 48px;
+      }
+      .kx-field input { font-size: 16px; }
+      .history-item { padding: 14px; }
+      .admin-user { flex-direction: column; }
+      .toast {
+        left: 12px;
+        right: 12px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        transform: none;
+        max-width: none;
+      }
+    }
+    @media (max-width: 380px) {
+      .theme-switcher { gap: 2px; padding: 3px; }
+      .theme-btn { width: 22px; height: 22px; }
+      .brand-icon { width: 32px; height: 32px; }
+    }
   </style>
 </head>
 <body>
@@ -1029,7 +1141,7 @@
   <section class="smudge-root" id="smudgeRoot" aria-label="Homescreen">
     <div class="plasma-home" id="plasmaHome" aria-hidden="true"></div>
     <div class="smudge-brand">news-sh</div>
-    <div class="smudge-hint" id="smudgeHint">Move the cursor</div>
+    <div class="smudge-hint" id="smudgeHint">Move the cursor · or swipe</div>
     <div class="smudge-fg">
       <h1>NEWS-SH</h1>
     </div>
@@ -2558,15 +2670,25 @@ void main() {
       pointer.y = y;
     }
 
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
+      || ("ontouchstart" in window);
+    // Fewer moves needed on phone to show Log in
+    const movesNeeded = isTouchDevice ? 3 : LOGIN_AFTER_MOVES;
+    if (hintEl && isTouchDevice) {
+      hintEl.textContent = "Swipe across the screen";
+    }
+
     root.addEventListener("mousemove", (e) => onMove(e.pageX, e.pageY));
     root.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      onMove(e.touches[0].pageX, e.touches[0].pageY);
-    }, { passive: false });
+      if (e.touches[0]) {
+        onMove(e.touches[0].pageX, e.touches[0].pageY);
+        // seed a blob immediately on tap
+        stampBlob(e.touches[0].pageX, e.touches[0].pageY, isTouchDevice ? 48 : 28);
+      }
+    }, { passive: true });
     root.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      onMove(e.touches[0].pageX, e.touches[0].pageY);
-    }, { passive: false });
+      if (e.touches[0]) onMove(e.touches[0].pageX, e.touches[0].pageY);
+    }, { passive: true });
 
     function stampBlob(cx, cy, r) {
       // Cap active circles so SVG filter doesn't explode CPU
@@ -2579,7 +2701,7 @@ void main() {
       container.prepend(circle);
       blobs.push({ el: circle, cx, cy, baseRadius: r, startTime: performance.now() });
       moveCount++;
-      if (!loginShown && moveCount >= LOGIN_AFTER_MOVES) {
+      if (!loginShown && moveCount >= movesNeeded) {
         loginShown = true;
         if (loginBtn) loginBtn.classList.add("visible");
         if (hintEl) hintEl.style.opacity = "0";
