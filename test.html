@@ -6,12 +6,11 @@
   <meta name="description" content="news — AI news by date and language">
   <title>news</title>
   <!-- Favicon / app icon — replace favicon.png with your own (works on GitHub Pages) -->
-  <link rel="icon" type="image/png" href="./news_files/favicon.png">
-  <link rel="apple-touch-icon" href="./news_files/favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com/">
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-  <link href="./news_files/css2" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="https://news-sh.github.io/ai/news_files/favicon.png">
+  <link rel="apple-touch-icon" href="https://news-sh.github.io/ai/news_files/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root, [data-theme="default"] {
       --bg-deep: #05060a;
@@ -1044,7 +1043,7 @@
   <div id="app">
     <header class="header glass">
       <div class="brand">
-        <div class="brand-icon" id="brandIcon"><img src="./news_files/favicon.png" alt=""></div>
+        <div class="brand-icon" id="brandIcon"><img src="https://news-sh.github.io/ai/news_files/favicon.png" alt=""></div>
         <div>
           <h1>news</h1>
           <span>by chrisben and jovial</span>
@@ -1238,9 +1237,9 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="./news_files/firebase-app-compat.js"></script>
-  <script src="./news_files/firebase-auth-compat.js"></script>
-  <script src="./news_files/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
     // ============================================================
     // FIREBASE CONFIG — paste your project values
@@ -1336,14 +1335,15 @@
       } catch (_) {}
     })();
 
-    // Optional custom brand icon (same folder as index.html on GitHub Pages)
+    // Brand icon (CDN / deployed path — avoids local 404)
     (function tryBrandIcon() {
+      const src = "https://news-sh.github.io/ai/news_files/favicon.png";
       const img = new Image();
       img.onload = () => {
         const el = $("#brandIcon");
-        if (el) el.innerHTML = `<img src="favicon.png" alt="" />`;
+        if (el) el.innerHTML = `<img src="${src}" alt="" />`;
       };
-      img.src = "favicon.png";
+      img.src = src;
     })();
 
     (function setToday() {
