@@ -531,9 +531,12 @@
       z-index: 90;
       width: 100%;
       height: 100svh;
+      height: 100dvh;
       overflow: hidden;
       user-select: none;
+      -webkit-user-select: none;
       background: #050508;
+      touch-action: none;
     }
     .smudge-root.hidden { display: none; }
     .plasma-home {
@@ -2616,17 +2619,21 @@ void main() {
   <!-- Smudge Reveal engine -->
   <script>
   (function () {
-    const SMOOTHING = 0.18;
-    const SPEED_THRESHOLD = 1.2;
-    const SIZE_FROM_SPEED = 0.22;
-    // Bigger holes that stay open longer so background text is readable
-    const EXPAND_MULT = 3.2;
-    const EXPAND_MS = 2800;
-    const DISSOLVE_START = 5500;
-    const DISSOLVE_MS = 4000;
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
+      || ("ontouchstart" in window)
+      || navigator.maxTouchPoints > 0;
+    const SMOOTHING = isTouchDevice ? 0.35 : 0.18;
+    const SPEED_THRESHOLD = isTouchDevice ? 0.15 : 0.8;
+    const SIZE_FROM_SPEED = isTouchDevice ? 0.35 : 0.22;
+    // Bigger holes that stay open long enough to read text
+    const EXPAND_MULT = isTouchDevice ? 4 : 3.2;
+    const EXPAND_MS = isTouchDevice ? 1200 : 2800;
+    const DISSOLVE_START = isTouchDevice ? 9000 : 5500; // hold open ~8s on phones
+    const DISSOLVE_MS = isTouchDevice ? 5000 : 4000;
     const TOTAL_LIFE = DISSOLVE_START + DISSOLVE_MS;
-    const LOGIN_AFTER_MOVES = 5;
-    const MAX_BLOBS = 14;
+    const LOGIN_AFTER_MOVES = isTouchDevice ? 2 : 5;
+    const MAX_BLOBS = isTouchDevice ? 12 : 14;
+    const MIN_BLOB_R = isTouchDevice ? 56 : 28;
 
     function smoothstep(t) {
       const c = Math.max(0, Math.min(1, t));
@@ -2670,25 +2677,39 @@ void main() {
       pointer.y = y;
     }
 
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
-      || ("ontouchstart" in window);
-    // Fewer moves needed on phone to show Log in
-    const movesNeeded = isTouchDevice ? 3 : LOGIN_AFTER_MOVES;
+    const movesNeeded = LOGIN_AFTER_MOVES;
     if (hintEl && isTouchDevice) {
-      hintEl.textContent = "Swipe across the screen";
+      hintEl.textContent = "Swipe or drag your finger";
+    }
+
+    // Always show Log in after a short delay on phones so users aren't stuck
+    if (isTouchDevice) {
+      setTimeout(() => {
+        if (!loginShown) {
+          loginShown = true;
+          if (loginBtn) loginBtn.classList.add("visible");
+          if (hintEl) hintEl.style.opacity = "0";
+        }
+      }, 2500);
     }
 
     root.addEventListener("mousemove", (e) => onMove(e.pageX, e.pageY));
-    root.addEventListener("touchstart", (e) => {
-      if (e.touches[0]) {
-        onMove(e.touches[0].pageX, e.touches[0].pageY);
-        // seed a blob immediately on tap
-        stampBlob(e.touches[0].pageX, e.touches[0].pageY, isTouchDevice ? 48 : 28);
+
+    let lastTouchStamp = 0;
+    function handleTouch(e) {
+      if (!e.touches || !e.touches[0]) return;
+      const x = e.touches[0].pageX;
+      const y = e.touches[0].pageY;
+      onMove(x, y);
+      // Stamp directly on touch — don't rely on velocity (phones felt "broken")
+      const now = performance.now();
+      if (now - lastTouchStamp > 40) {
+        lastTouchStamp = now;
+        stampBlob(x, y, MIN_BLOB_R + Math.random() * 20);
       }
-    }, { passive: true });
-    root.addEventListener("touchmove", (e) => {
-      if (e.touches[0]) onMove(e.touches[0].pageX, e.touches[0].pageY);
-    }, { passive: true });
+    }
+    root.addEventListener("touchstart", handleTouch, { passive: true });
+    root.addEventListener("touchmove", handleTouch, { passive: true });
 
     function stampBlob(cx, cy, r) {
       // Cap active circles so SVG filter doesn't explode CPU
@@ -2726,7 +2747,7 @@ void main() {
         smooth.y += (pointer.y - smooth.y) * SMOOTHING;
         const speed = Math.hypot(pointer.x - smooth.x, pointer.y - smooth.y);
         if (speed > SPEED_THRESHOLD) {
-          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, 28));
+          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, MIN_BLOB_R));
         }
       }
       for (let i = blobs.length - 1; i >= 0; i--) {
