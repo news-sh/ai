@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="news — AI news by date and language" />
+<!-- saved from url=(0029)https://news-sh.github.io/ai/ -->
+<html lang="en" data-theme="default"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="news — AI news by date and language">
   <title>news</title>
   <!-- Favicon / app icon — replace favicon.png with your own (works on GitHub Pages) -->
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="./news_files/favicon.png">
+  <link rel="apple-touch-icon" href="./news_files/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="./news_files/css2" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root, [data-theme="default"] {
       --bg-deep: #05060a;
@@ -441,9 +442,460 @@
     .glass.minimized .panel-body { display: none; }
     .glass.minimized .panel-head { margin-bottom: 0; }
     .glass.minimized .panel-head .hint { display: none; }
+
+    /* ── Smudge Reveal homescreen ── */
+    .smudge-root {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      width: 100%;
+      height: 100svh;
+      overflow: hidden;
+      user-select: none;
+      background: #050508;
+    }
+    .smudge-root.hidden { display: none; }
+    .plasma-home {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .plasma-home canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .smudge-fg,
+    .smudge-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      text-transform: uppercase;
+    }
+    .smudge-fg {
+      background: rgba(5, 5, 8, 0.55);
+      color: #f0ece4;
+      z-index: 1;
+    }
+    .smudge-fg h1 {
+      font-size: clamp(3.2rem, 18vw, 22rem);
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 0.85;
+      margin: 0;
+    }
+    .smudge-bg {
+      background: #ede8df;
+      color: #1a1812;
+      z-index: 2;
+      align-items: center;
+      mask: url(#kx-smudge-mask);
+      -webkit-mask: url(#kx-smudge-mask);
+    }
+    .smudge-bg p {
+      font-size: clamp(1.25rem, 3vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      max-width: 16ch;
+      text-align: center;
+      margin: 0;
+    }
+    .smudge-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .smudge-brand {
+      position: absolute;
+      top: 1.5rem; left: 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #f0ece4;
+      mix-blend-mode: difference;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .smudge-hint {
+      position: absolute;
+      bottom: 1.5rem; right: 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #f0ece4;
+      mix-blend-mode: difference;
+      opacity: 0.5;
+      z-index: 10;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .smudge-login {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 20;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border-radius: 999px;
+      border: 2px solid #f0ece4;
+      background: transparent;
+      color: #f0ece4;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease, background 0.2s, color 0.2s;
+      mix-blend-mode: difference;
+    }
+    .smudge-login.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .smudge-login:hover {
+      background: #f0ece4;
+      color: #0a0a0a;
+      mix-blend-mode: normal;
+    }
+    .smudge-login:active {
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    /* ── Kexsio-style auth card ── */
+    #authOverlay.overlay {
+      padding: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+    .kx-page {
+      --kx-purple: 156, 86, 255;
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      min-height: 100svh;
+      width: 100%;
+      place-items: center;
+      overflow: hidden;
+      padding: 28px 18px;
+      color: white;
+      background:
+        radial-gradient(circle at 50% -12%, rgba(226, 190, 255, 0.42), transparent 32%),
+        radial-gradient(circle at 50% 22%, rgba(150, 64, 255, 0.34), transparent 43%),
+        linear-gradient(180deg, #6f2ab7 0%, #30104e 40%, #0a0710 76%, #030304 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    .kx-grid {
+      position: absolute; inset: 0; z-index: -8; opacity: 0.14;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: linear-gradient(to bottom, #000, transparent 84%);
+    }
+    .kx-noise {
+      position: absolute; inset: 0; z-index: 10; pointer-events: none; opacity: 0.035;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .kx-halo, .kx-orb {
+      position: absolute; z-index: -7; pointer-events: none; border-radius: 999px;
+    }
+    .kx-halo-top {
+      top: -42vh; left: 50%; width: min(1180px, 135vw); height: 78vh;
+      transform: translateX(-50%); background: rgba(229,197,255,0.18); filter: blur(68px);
+    }
+    .kx-halo-bottom {
+      left: 50%; bottom: -58vh; width: min(1040px, 125vw); height: 92vh;
+      transform: translateX(-50%); background: rgba(var(--kx-purple), 0.26); filter: blur(95px);
+    }
+    .kx-orb { width: 380px; height: 380px; filter: blur(112px); animation: kx-float 17s ease-in-out infinite; }
+    .kx-orb-left { top: 12%; left: 7%; background: rgba(255,255,255,0.07); }
+    .kx-orb-right { right: 5%; bottom: 8%; background: rgba(204,147,255,0.10); animation-delay: -8s; }
+    @keyframes kx-float {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      35% { transform: translate3d(48px,-26px,0) scale(1.08); }
+      70% { transform: translate3d(-22px,34px,0) scale(0.96); }
+    }
+    .kx-stage {
+      width: min(100%, 410px);
+      perspective: 1500px;
+      animation: kx-enter 800ms cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes kx-enter {
+      from { opacity: 0; transform: translateY(24px) scale(.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .kx-tilt {
+      width: 100%; transform-style: preserve-3d;
+      transition: transform 170ms ease-out; will-change: transform;
+    }
+    .kx-card-shell { position: relative; border-radius: 25px; transform-style: preserve-3d; }
+    .kx-shadow {
+      position: absolute; inset: 7% 6% -7%; z-index: -2; border-radius: 28px;
+      background: rgba(0,0,0,0.76); filter: blur(36px); transition: filter 450ms ease;
+    }
+    .kx-card-shell:hover .kx-shadow { filter: blur(44px); }
+    .kx-runners {
+      position: absolute; inset: -1px; z-index: 3; overflow: hidden; border-radius: 25px;
+      pointer-events: none; transform: translateZ(24px);
+    }
+    .kx-runner {
+      position: absolute; display: block; border-radius: 999px; opacity: .9;
+      filter: blur(.4px) drop-shadow(0 0 7px #fff) drop-shadow(0 0 16px rgba(212,170,255,.75));
+    }
+    .kx-runner-top, .kx-runner-bottom {
+      width: 43%; height: 2px; background: linear-gradient(90deg, transparent, #fff, transparent);
+    }
+    .kx-runner-right, .kx-runner-left {
+      width: 2px; height: 43%; background: linear-gradient(180deg, transparent, #fff, transparent);
+    }
+    .kx-runner-top { top: 0; left: -48%; animation: kx-top 4s cubic-bezier(.65,0,.35,1) infinite; }
+    .kx-runner-right { top: -48%; right: 0; animation: kx-right 4s 1s cubic-bezier(.65,0,.35,1) infinite; }
+    .kx-runner-bottom { right: -48%; bottom: 0; animation: kx-bottom 4s 2s cubic-bezier(.65,0,.35,1) infinite; }
+    .kx-runner-left { bottom: -48%; left: 0; animation: kx-left 4s 3s cubic-bezier(.65,0,.35,1) infinite; }
+    @keyframes kx-top { 0%,18%{left:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{left:105%;opacity:0} }
+    @keyframes kx-right { 0%,18%{top:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{top:105%;opacity:0} }
+    @keyframes kx-bottom { 0%,18%{right:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{right:105%;opacity:0} }
+    @keyframes kx-left { 0%,18%{bottom:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{bottom:105%;opacity:0} }
+    .kx-card {
+      position: relative; z-index: 1; overflow: hidden; padding: 28px;
+      border: 1px solid rgba(255,255,255,.075); border-radius: 24px;
+      background: linear-gradient(145deg, rgba(18,13,23,.80), rgba(4,4,6,.64)), rgba(4,3,7,.72);
+      box-shadow: 0 30px 95px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.045), inset 0 -1px 0 rgba(255,255,255,.025);
+      backdrop-filter: blur(24px) saturate(135%);
+      -webkit-backdrop-filter: blur(24px) saturate(135%);
+      transform: translateZ(18px);
+    }
+    .kx-card::before {
+      position: absolute; inset: 0; z-index: -1; content: ""; pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.055), transparent 24%),
+        radial-gradient(circle at 50% 0%, rgba(201,148,255,.11), transparent 40%);
+    }
+    .kx-pointer-glow {
+      position: absolute; z-index: -1; width: 290px; height: 290px;
+      transform: translate(-50%,-50%); border-radius: 999px; pointer-events: none; opacity: .24;
+      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 68%);
+      filter: blur(24px); transition: left 120ms linear, top 120ms linear;
+      left: 50%; top: 42%;
+    }
+    .kx-card-pattern {
+      position: absolute; inset: 0; z-index: -2; opacity: .045; pointer-events: none;
+      background-image: linear-gradient(135deg, #fff .7px, transparent .7px), linear-gradient(45deg, #fff .7px, transparent .7px);
+      background-size: 34px 34px;
+    }
+    .kx-header { margin-bottom: 18px; text-align: center; }
+    .kx-logo {
+      position: relative; display: grid; width: 46px; height: 46px; margin: 0 auto 12px;
+      place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.12); border-radius: 50%;
+      background: radial-gradient(circle at 32% 22%, rgba(255,255,255,.24), transparent 30%),
+        linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.025));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 10px 30px rgba(0,0,0,.36);
+    }
+    .kx-logo span { position: relative; z-index: 2; font-size: 18px; font-weight: 760; letter-spacing: -.04em; }
+    .kx-logo i {
+      position: absolute; top: -25%; left: -75%; width: 55%; height: 150%; transform: rotate(22deg);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.52), transparent);
+      animation: kx-logo-shine 4.8s 1s ease-in-out infinite;
+    }
+    @keyframes kx-logo-shine {
+      0%,66%{left:-75%;opacity:0} 73%{opacity:.8} 93%,100%{left:130%;opacity:0}
+    }
+    .kx-header h1 {
+      margin: 0; color: transparent; background: linear-gradient(180deg, #fff, rgba(255,255,255,.72));
+      background-clip: text; -webkit-background-clip: text;
+      font-size: clamp(22px, 5vw, 27px); font-weight: 730; letter-spacing: -.04em;
+    }
+    .kx-header p { margin: 7px 0 0; color: rgba(255,255,255,.48); font-size: 12px; }
+    .kx-tabs {
+      display: flex; gap: 4px; padding: 4px; margin-bottom: 14px;
+      border-radius: 12px; background: rgba(0,0,0,.28);
+    }
+    .kx-tab {
+      flex: 1; padding: 8px; border: none; border-radius: 9px; cursor: pointer;
+      background: transparent; color: rgba(255,255,255,.45);
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      transition: background .2s, color .2s;
+    }
+    .kx-tab.active { background: rgba(255,255,255,.1); color: #fff; }
+    .kx-card form, #kxAuthForm { display: grid; gap: 13px; }
+    .kx-field {
+      position: relative; display: flex; height: 46px; align-items: center; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.075); border-radius: 11px;
+      background: rgba(255,255,255,.045);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 8px 25px rgba(0,0,0,.1);
+      transition: border-color 230ms ease, background 230ms ease, box-shadow 230ms ease, transform 230ms ease;
+    }
+    .kx-field:hover { transform: scale(1.008); }
+    .kx-field.kx-focused {
+      border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.075);
+      box-shadow: 0 0 0 3px rgba(203,151,255,.06), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .kx-field-icon {
+      position: relative; z-index: 2; width: 17px; height: 17px; flex: 0 0 17px; margin-left: 14px;
+      color: rgba(255,255,255,.36); stroke: currentColor; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round; transition: color 220ms ease, filter 220ms ease;
+    }
+    .kx-field.kx-focused .kx-field-icon {
+      color: rgba(255,255,255,.94); filter: drop-shadow(0 0 8px rgba(255,255,255,.25));
+    }
+    .kx-field input {
+      position: relative; z-index: 2; width: 100%; min-width: 0; height: 100%;
+      padding: 0 14px 0 11px; border: 0; outline: 0; color: rgba(255,255,255,.94);
+      background: transparent; font-size: 13px; font-family: inherit;
+    }
+    .kx-field input::placeholder { color: rgba(255,255,255,.28); }
+    .kx-field-light {
+      position: absolute; inset: 0; opacity: 0; pointer-events: none;
+      background: radial-gradient(circle at 18% 50%, rgba(205,154,255,.10), transparent 38%);
+      transition: opacity 230ms ease;
+    }
+    .kx-field.kx-focused .kx-field-light { opacity: 1; }
+    .kx-password-toggle {
+      position: relative; z-index: 3; display: grid; width: 42px; height: 100%; flex: 0 0 42px;
+      place-items: center; border: 0; outline: 0; color: rgba(255,255,255,.38);
+      background: transparent; cursor: pointer; transition: color 200ms ease, transform 200ms ease;
+    }
+    .kx-password-toggle:hover { color: rgba(255,255,255,.92); transform: scale(1.05); }
+    .kx-password-toggle svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .kx-meta {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      color: rgba(255,255,255,.48); font-size: 11px;
+    }
+    .kx-hint-link { color: rgba(255,255,255,.35); letter-spacing: 0.06em; text-transform: uppercase; font-size: 10px; }
+    .kx-remember { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .kx-remember input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .kx-checkbox {
+      display: grid; width: 16px; height: 16px; place-items: center; overflow: hidden;
+      border: 1px solid rgba(255,255,255,.17); border-radius: 5px; background: rgba(255,255,255,.05);
+      color: #09080b; transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .kx-remember input:checked + .kx-checkbox {
+      border-color: #fff; background: #fff; box-shadow: 0 0 14px rgba(255,255,255,.16);
+    }
+    .kx-checkbox svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+    .kx-remember input:checked + .kx-checkbox svg { opacity: 1; }
+    .auth-error {
+      color: #fb7185; font-size: 0.78rem; min-height: 1.1em; text-align: left; margin: -4px 0;
+    }
+    .kx-sign-in, .kx-google {
+      position: relative; width: 100%; height: 46px; overflow: hidden; border-radius: 11px; cursor: pointer;
+      font-family: inherit;
+    }
+    .kx-sign-in {
+      display: grid; margin-top: 4px; place-items: center; border: 0; color: #08070a; background: #fff;
+      box-shadow: 0 13px 30px rgba(0,0,0,.25), inset 0 -1px 0 rgba(0,0,0,.08);
+      font-size: 13px; font-weight: 680; transition: transform 210ms ease, box-shadow 210ms ease;
+    }
+    .kx-sign-in:hover:not(:disabled) {
+      transform: scale(1.015);
+      box-shadow: 0 16px 36px rgba(0,0,0,.30), 0 0 30px rgba(255,255,255,.12);
+    }
+    .kx-sign-in:active:not(:disabled) { transform: scale(.985); }
+    .kx-sign-in:disabled { cursor: progress; opacity: 0.85; }
+    .kx-button-glow {
+      position: absolute; inset: -16px; z-index: -1; border-radius: 20px; opacity: 0;
+      background: rgba(255,255,255,.25); filter: blur(18px); transition: opacity 250ms ease;
+    }
+    .kx-sign-in:hover .kx-button-glow { opacity: 1; }
+    .kx-button-sheen {
+      position: absolute; top: -50%; left: -45%; width: 34%; height: 200%; transform: rotate(18deg);
+      background: linear-gradient(90deg, transparent, rgba(0,0,0,.075), transparent);
+      animation: kx-button-sheen 3.4s ease-in-out infinite;
+    }
+    @keyframes kx-button-sheen {
+      0%,54%{left:-45%;opacity:0} 62%{opacity:1} 88%,100%{left:120%;opacity:0}
+    }
+    .kx-button-copy {
+      position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 7px;
+    }
+    .kx-button-copy svg {
+      width: 16px; height: 16px; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round; transition: transform 220ms ease;
+    }
+    .kx-sign-in:hover .kx-button-copy svg { transform: translateX(3px); }
+    .kx-divider { display: flex; align-items: center; gap: 12px; margin: 2px 0; }
+    .kx-divider span { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(255,255,255,.085)); }
+    .kx-divider span:last-child { background: linear-gradient(90deg, rgba(255,255,255,.085), transparent); }
+    .kx-divider em { color: rgba(255,255,255,.3); font-size: 11px; font-style: normal; }
+    .kx-google {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      border: 1px solid rgba(255,255,255,.09); color: rgba(255,255,255,.74);
+      background: rgba(255,255,255,.045); font-size: 12px; font-weight: 540;
+      transition: border-color 230ms ease, background 230ms ease, color 230ms ease, transform 210ms ease;
+    }
+    .kx-google:hover {
+      transform: scale(1.012); border-color: rgba(255,255,255,.18); color: white; background: rgba(255,255,255,.07);
+    }
+    .kx-google:active { transform: scale(.985); }
+    .kx-google > svg, .kx-google > span { position: relative; z-index: 2; }
+    .kx-google > i {
+      position: absolute; inset: 0; transform: translateX(-110%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+      transition: transform 780ms cubic-bezier(.22,1,.36,1);
+    }
+    .kx-google:hover > i { transform: translateX(110%); }
+    .kx-signup {
+      margin: 2px 0 0; text-align: center; color: rgba(255,255,255,.42); font-size: 11px;
+    }
+    .kx-signup a {
+      position: relative; color: rgba(255,255,255,.84); font-weight: 620; text-decoration: none;
+    }
+    .kx-signup a:hover { color: #fff; }
+    @media (max-width: 520px) {
+      .kx-page { padding: 18px 13px; }
+      .kx-card { padding: 24px 20px; border-radius: 22px; }
+      .kx-card-shell, .kx-runners { border-radius: 23px; }
+    }
   </style>
 </head>
 <body>
+  <!-- Smudge Reveal homescreen + Plasma -->
+  <section class="smudge-root" id="smudgeRoot" aria-label="Homescreen">
+    <div class="plasma-home" id="plasmaHome" aria-hidden="true"></div>
+    <div class="smudge-brand">news-sh</div>
+    <div class="smudge-hint" id="smudgeHint">Move the cursor</div>
+    <div class="smudge-fg">
+      <h1>NEWS-SH</h1>
+    </div>
+    <div class="smudge-bg">
+      <p>Let's automate some task</p>
+    </div>
+    <svg class="smudge-svg" id="smudgeSvg" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <filter id="kx-smudge-goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="25" />
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 60 -14" />
+        </filter>
+      </defs>
+      <mask id="kx-smudge-mask">
+        <g id="smudgeBlobs" filter="url(#kx-smudge-goo)"></g>
+      </mask>
+    </svg>
+    <button type="button" class="smudge-login" id="smudgeLoginBtn">Log in</button>
+  </section>
+
   <div class="scene" aria-hidden="true">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -453,7 +905,7 @@
   <div id="app">
     <header class="header glass">
       <div class="brand">
-        <div class="brand-icon" id="brandIcon">✦</div>
+        <div class="brand-icon" id="brandIcon"><img src="./news_files/favicon.png" alt=""></div>
         <div>
           <h1>news</h1>
           <span>by chrisben and jovial</span>
@@ -474,7 +926,7 @@
       <div class="panel-head">
         <h2>Generate news</h2>
         <div class="panel-head-right">
-          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize">−</button>
+          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize" data-bound="1">−</button>
         </div>
         <p class="hint">Pick a date and language. Briefings pull real India-focused events (search-grounded when the API key allows).</p>
       </div>
@@ -482,7 +934,7 @@
         <div class="gen-grid">
           <div class="field">
             <label for="dateInput">Date</label>
-            <input type="date" id="dateInput" />
+            <input type="date" id="dateInput">
           </div>
           <div class="field">
             <label for="langInput">Language</label>
@@ -496,8 +948,8 @@
           </div>
         </div>
         <div class="gen-actions">
-          <button class="btn btn-primary btn-lg" id="generateBtn" disabled>Generate</button>
-          <button class="btn btn-lg" id="viewAllBtn" disabled>View all news</button>
+          <button class="btn btn-primary btn-lg" id="generateBtn">Generate</button>
+          <button class="btn btn-lg" id="viewAllBtn">View all news</button>
           <div class="loading-row" id="loadingRow">
             <span class="spinner"></span>
             <span id="loadingText">Generating…</span>
@@ -510,7 +962,7 @@
       <div class="panel-head">
         <h3 style="font-size:0.95rem;font-weight:600;">Latest briefing</h3>
         <div class="panel-head-right">
-          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize">−</button>
+          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize" data-bound="1">−</button>
         </div>
       </div>
       <div class="panel-body">
@@ -524,7 +976,7 @@
         <h3>All your news</h3>
         <div class="panel-head-right">
           <span id="newsCount" style="font-size:0.75rem;color:var(--text-muted);"></span>
-          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize">−</button>
+          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize" data-bound="1">−</button>
         </div>
       </div>
       <div class="panel-body">
@@ -538,7 +990,7 @@
       <div class="panel-head">
         <h3>Admin</h3>
         <div class="panel-head-right">
-          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize">−</button>
+          <button type="button" class="btn btn-min min-btn" title="Minimize" aria-label="Minimize" data-bound="1">−</button>
         </div>
         <p class="hint">API chamber + all users &amp; their news</p>
       </div>
@@ -547,8 +999,8 @@
           <h4>API chamber</h4>
           <p class="hint" style="margin-top:-6px;">Keys rotate on each generate (round-robin). New keys often start with <code style="color:var(--accent)">aq</code>.</p>
           <div class="chamber-add">
-            <input type="text" id="newKeyInput" placeholder="Paste API key (e.g. aq…)" autocomplete="off" />
-            <input type="text" id="newKeyLabel" placeholder="Label (optional)" style="max-width:140px" />
+            <input type="text" id="newKeyInput" placeholder="Paste API key (e.g. aq…)" autocomplete="off">
+            <input type="text" id="newKeyLabel" placeholder="Label (optional)" style="max-width:140px">
             <button class="btn btn-primary btn-sm" id="addKeyBtn">Add key</button>
           </div>
           <div class="key-list" id="keyList">
@@ -564,39 +1016,92 @@
     </section>
   </div>
 
-  <div class="overlay" id="authOverlay">
-    <div class="auth-card glass glass-strong">
-      <div class="brand-icon" style="margin:0 auto 16px;width:48px;height:48px;font-size:22px;">✦</div>
-      <h2>Welcome to news</h2>
-      <p class="sub">Sign in to generate and save your briefings</p>
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">Sign in</button>
-        <button class="auth-tab" data-tab="signup">Sign up</button>
-      </div>
-      <div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" autocomplete="email" placeholder="you@example.com" />
+  <div class="overlay hidden" id="authOverlay">
+    <div class="kx-page" id="kxAuthPage">
+      <div class="kx-grid" aria-hidden="true"></div>
+      <div class="kx-noise" aria-hidden="true"></div>
+      <div class="kx-halo kx-halo-top" aria-hidden="true"></div>
+      <div class="kx-halo kx-halo-bottom" aria-hidden="true"></div>
+      <div class="kx-orb kx-orb-left" aria-hidden="true"></div>
+      <div class="kx-orb kx-orb-right" aria-hidden="true"></div>
+      <section class="kx-stage">
+        <div class="kx-tilt" id="kxTilt">
+          <div class="kx-card-shell">
+            <div class="kx-shadow" aria-hidden="true"></div>
+            <div class="kx-runners" aria-hidden="true">
+              <span class="kx-runner kx-runner-top"></span>
+              <span class="kx-runner kx-runner-right"></span>
+              <span class="kx-runner kx-runner-bottom"></span>
+              <span class="kx-runner kx-runner-left"></span>
+            </div>
+            <article class="kx-card">
+              <div class="kx-pointer-glow" id="kxGlow" aria-hidden="true"></div>
+              <div class="kx-card-pattern" aria-hidden="true"></div>
+              <header class="kx-header">
+                <div class="kx-logo"><span>N</span><i aria-hidden="true"></i></div>
+                <h1 id="kxAuthTitle">Welcome back</h1>
+                <p id="kxAuthSub">Sign in to continue to news-sh</p>
+              </header>
+              <div class="kx-tabs">
+                <button type="button" class="kx-tab active auth-tab" data-tab="login">Sign in</button>
+                <button type="button" class="kx-tab auth-tab" data-tab="signup">Sign up</button>
+              </div>
+              <form id="kxAuthForm" autocomplete="on">
+                <label class="kx-field" id="kxEmailField">
+                  <svg class="kx-field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+                  <input type="email" id="email" placeholder="Email address" autocomplete="email" required>
+                  <span class="kx-field-light" aria-hidden="true"></span>
+                </label>
+                <label class="kx-field" id="kxPassField">
+                  <svg class="kx-field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                  <input type="password" id="password" placeholder="Password" autocomplete="current-password" required>
+                  <button class="kx-password-toggle" type="button" id="kxTogglePass" aria-label="Show password">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+                  </button>
+                  <span class="kx-field-light" aria-hidden="true"></span>
+                </label>
+                <div class="auth-error" id="authError"></div>
+                <div class="kx-meta">
+                  <label class="kx-remember">
+                    <input type="checkbox" id="kxRemember">
+                    <span class="kx-checkbox"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6"/></svg></span>
+                    <span>Remember me</span>
+                  </label>
+                  <span class="kx-hint-link">news-sh</span>
+                </div>
+                <button class="kx-sign-in" type="submit" id="authSubmit">
+                  <span class="kx-button-glow" aria-hidden="true"></span>
+                  <span class="kx-button-sheen" aria-hidden="true"></span>
+                  <span class="kx-button-copy" id="authSubmitLabel">
+                    Sign in
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </span>
+                </button>
+                <div class="kx-divider"><span></span><em>or</em><span></span></div>
+                <button class="kx-google" type="button" id="googleBtn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" width="17" height="17">
+                    <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.38a4.6 4.6 0 0 1-2 3.01v2.53h3.23c1.9-1.75 2.99-4.32 2.99-7.38Z"/>
+                    <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.39l-3.23-2.53c-.9.6-2.04.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.05v2.61A10 10 0 0 0 12 22Z"/>
+                    <path fill="#FBBC05" d="M6.39 13.91A6.02 6.02 0 0 1 6.08 12c0-.66.11-1.3.31-1.91V7.48H3.05A10 10 0 0 0 2 12c0 1.61.39 3.14 1.05 4.52l3.34-2.61Z"/>
+                    <path fill="#EA4335" d="M12 5.96c1.47 0 2.79.51 3.82 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.95 5.48l3.34 2.61C7.18 7.72 9.39 5.96 12 5.96Z"/>
+                  </svg>
+                  <span>Continue with Google</span>
+                  <i aria-hidden="true"></i>
+                </button>
+                <p class="kx-signup" id="kxSignupLine">Don't have an account? <a href="#" id="kxSwitchSignup">Create account</a></p>
+              </form>
+            </article>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" />
-        </div>
-        <div class="auth-error" id="authError"></div>
-        <button class="btn btn-primary btn-full" id="authSubmit">Sign in</button>
-      </div>
-      <div class="auth-divider">or</div>
-      <div class="oauth-stack" style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-full" id="googleBtn" type="button">Continue with Google</button>
-      </div>
+      </section>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="./news_files/firebase-app-compat.js"></script>
+  <script src="./news_files/firebase-auth-compat.js"></script>
+  <script src="./news_files/firebase-firestore-compat.js"></script>
   <script>
     // ============================================================
     // FIREBASE CONFIG — paste your project values
@@ -615,11 +1120,7 @@
     const SUB_OWNER_EMAIL = "chrisbenmartink24@gmail.com";
     const ROLES = ["user", "marketing", "sub-owner", "admin"];
     const GEMINI_MODELS = [
-      "gemini-3.5-flash-lite",
-      "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
-      "gemini-1.5-pro"
+      "gemini-3.5-flash-lite"
     ];
 
     firebase.initializeApp(firebaseConfig);
@@ -783,35 +1284,108 @@
     }
 
     // ---------- Auth ----------
-    document.querySelectorAll(".auth-tab").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-        authMode = tab.dataset.tab;
-        $("#authSubmit").textContent = authMode === "login" ? "Sign in" : "Create account";
-        $("#authError").textContent = "";
+    function setAuthMode(mode) {
+      authMode = mode === "signup" ? "signup" : "login";
+      document.querySelectorAll(".auth-tab").forEach((t) => {
+        t.classList.toggle("active", t.dataset.tab === authMode);
       });
+      const title = $("#kxAuthTitle");
+      const sub = $("#kxAuthSub");
+      const label = $("#authSubmitLabel");
+      const line = $("#kxSignupLine");
+      if (title) title.textContent = authMode === "login" ? "Welcome back" : "Create account";
+      if (sub) sub.textContent = authMode === "login" ? "Sign in to continue to news-sh" : "Join news-sh in a few seconds";
+      if (label) {
+        label.innerHTML = authMode === "login"
+          ? 'Sign in<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+          : 'Create account<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      }
+      if (line) {
+        line.innerHTML = authMode === "login"
+          ? 'Don\'t have an account? <a href="#" id="kxSwitchSignup">Create account</a>'
+          : 'Already have an account? <a href="#" id="kxSwitchSignup">Sign in</a>';
+        const a = $("#kxSwitchSignup");
+        if (a) a.onclick = (e) => { e.preventDefault(); setAuthMode(authMode === "login" ? "signup" : "login"); };
+      }
+      const err = $("#authError");
+      if (err) err.textContent = "";
+    }
+
+    document.querySelectorAll(".auth-tab").forEach((tab) => {
+      tab.addEventListener("click", () => setAuthMode(tab.dataset.tab));
+    });
+    const switchLink = $("#kxSwitchSignup");
+    if (switchLink) {
+      switchLink.onclick = (e) => { e.preventDefault(); setAuthMode(authMode === "login" ? "signup" : "login"); };
+    }
+
+    // Field focus rings
+    ["email", "password"].forEach((id) => {
+      const input = $("#" + id);
+      if (!input) return;
+      const field = input.closest(".kx-field");
+      input.addEventListener("focus", () => field && field.classList.add("kx-focused"));
+      input.addEventListener("blur", () => field && field.classList.remove("kx-focused"));
     });
 
-    $("#authSubmit").addEventListener("click", async () => {
+    // Password visibility
+    const togglePass = $("#kxTogglePass");
+    if (togglePass) {
+      togglePass.addEventListener("click", () => {
+        const pass = $("#password");
+        if (!pass) return;
+        const show = pass.type === "password";
+        pass.type = show ? "text" : "password";
+        togglePass.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      });
+    }
+
+    // Card tilt + pointer glow
+    (function bindKxTilt() {
+      const tilt = $("#kxTilt");
+      const glow = $("#kxGlow");
+      if (!tilt) return;
+      tilt.addEventListener("pointermove", (e) => {
+        if (e.pointerType === "touch") return;
+        const b = tilt.getBoundingClientRect();
+        const rx = (e.clientX - b.left) / b.width;
+        const ry = (e.clientY - b.top) / b.height;
+        tilt.style.transform = `rotateX(${(0.5 - ry) * 13}deg) rotateY(${(rx - 0.5) * 13}deg)`;
+        if (glow) { glow.style.left = (rx * 100) + "%"; glow.style.top = (ry * 100) + "%"; }
+      });
+      const reset = () => {
+        tilt.style.transform = "rotateX(0deg) rotateY(0deg)";
+        if (glow) { glow.style.left = "50%"; glow.style.top = "42%"; }
+      };
+      tilt.addEventListener("pointerleave", reset);
+      tilt.addEventListener("pointercancel", reset);
+    })();
+
+    async function handleAuthSubmit(e) {
+      if (e) e.preventDefault();
       const email = $("#email").value.trim();
       const password = $("#password").value;
       const errEl = $("#authError");
       errEl.textContent = "";
       if (!email || !password) { errEl.textContent = "Email and password required."; return; }
       const btn = $("#authSubmit");
+      const label = $("#authSubmitLabel");
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
+      if (label) label.innerHTML = '<span class="spinner" style="width:18px;height:18px;border:2px solid rgba(0,0,0,.22);border-top-color:#09080a;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>';
       try {
         if (authMode === "login") await auth.signInWithEmailAndPassword(email, password);
         else await auth.createUserWithEmailAndPassword(email, password);
-      } catch (e) {
-        errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+      } catch (err) {
+        errEl.textContent = (err.message || "").replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
       } finally {
         btn.disabled = false;
-        btn.textContent = authMode === "login" ? "Sign in" : "Create account";
+        setAuthMode(authMode);
       }
-    });
+    }
+
+    const authForm = $("#kxAuthForm");
+    if (authForm) authForm.addEventListener("submit", handleAuthSubmit);
+    else $("#authSubmit").addEventListener("click", handleAuthSubmit);
 
     async function signInWithProvider(provider) {
       const errEl = $("#authError");
@@ -888,7 +1462,8 @@
         updateStaffPanel();
       } else {
         currentRole = "user";
-        $("#authOverlay").classList.remove("hidden");
+        // Smudge homescreen is the entry; auth opens only via Log in button
+        $("#authOverlay").classList.add("hidden");
         $("#generateBtn").disabled = true;
         if ($("#viewAllBtn")) $("#viewAllBtn").disabled = true;
         $("#userArea").innerHTML = `<div class="theme-switcher" id="themeSwitcher" title="Theme">
@@ -990,43 +1565,20 @@
       }
     }
 
-    function getTodayStr() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    }
-
-    function getTodayUsage(k) {
-      const today = getTodayStr();
-      if (k.lastUsedDate !== today) return 0;
-      return k.todayCount || 0;
-    }
-
     function getActiveKeys() {
-      const active = chamberKeys.filter((k) => k.active !== false && k.key && String(k.key).trim().length > 10);
-      // Sort so the lowest used API keys today are picked first (then by lowest total useCount)
-      return active.sort((a, b) => {
-        const diffToday = getTodayUsage(a) - getTodayUsage(b);
-        if (diffToday !== 0) return diffToday;
-        return (a.useCount || 0) - (b.useCount || 0);
-      });
+      return chamberKeys.filter((k) => k.active !== false && k.key && String(k.key).trim().length > 10);
     }
 
     function getNextKey() {
       const active = getActiveKeys();
       if (!active.length) return null;
-      const pick = active[0]; // Lowest used API key today
-      const today = getTodayStr();
-      const newTodayCount = getTodayUsage(pick) + 1;
-      pick.lastUsedDate = today;
-      pick.todayCount = newTodayCount;
-      pick.useCount = (pick.useCount || 0) + 1;
-
+      const pick = active[chamberIndex % active.length];
+      chamberIndex = (chamberIndex + 1) % active.length;
+      localStorage.setItem("chamberIndex", String(chamberIndex));
       if (pick.id) {
         db.collection("apiKeys").doc(pick.id).update({
           useCount: firebase.firestore.FieldValue.increment(1),
           lastUsedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          lastUsedDate: today,
-          todayCount: newTodayCount,
         }).catch(() => {});
       }
       return pick;
@@ -1048,7 +1600,7 @@
           <div>
             <div class="masked">${escapeHtml(maskKey(k.key))} ${k.label ? "· " + escapeHtml(k.label) : ""}</div>
             <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">
-              today: ${getTodayUsage(k)} · total uses: ${k.useCount || 0}
+              uses: ${k.useCount || 0}
             </div>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
@@ -1221,16 +1773,9 @@ Rules:
             const err = new Error(msg);
             err.status = res.status;
             err.raw = data;
-            // Never retry without tools if it's a quota, rate limit, billing, or API key error — throw immediately
-            if (isKeyAuthOrQuotaError(err, msg)) {
-              throw err;
-            }
-            // If request with tools failed for a tool/model shape error (e.g. HTTP 400), retry without tools
-            if (body.tools && (
-              res.status === 400 ||
-              /tool|google_search|not supported|unknown|invalid argument|invalid_argument/i.test(msg)
-            )) {
-              console.warn("[gemini] tools rejected, retrying without tools:", msg);
+            // If request with tools failed for ANY error, retry without tools
+            if (body.tools) {
+              console.warn("[gemini] request with tools failed, retrying without tools:", msg);
               lastErr = err;
               continue;
             }
@@ -1245,36 +1790,15 @@ Rules:
           return text;
         } catch (e) {
           lastErr = e;
-          // Never retry without tools if it's a quota, rate limit, billing, or API key error — throw immediately
-          if (isKeyAuthOrQuotaError(e)) {
-            throw e;
-          }
-          const m = String(e.message || e || "");
-          if (body.tools && /tool|google_search|not supported|unknown|invalid argument|invalid_argument/i.test(m)) {
-            console.warn("[gemini] request with tools threw error, retrying without tools:", m);
+          // If request with tools threw any error, retry without tools
+          if (body.tools) {
+            console.warn("[gemini] request with tools threw error, retrying without tools:", e.message || e);
             continue;
           }
           throw e;
         }
       }
       throw lastErr || new Error("Generation failed");
-    }
-
-    /** Returns true if the error is due to API key quota, billing, rate limit, or authentication */
-    function isKeyAuthOrQuotaError(err, msgStr) {
-      if (!err) return false;
-      const status = err.status;
-      if (status === 401 || status === 403 || status === 429) return true;
-      const m = String(msgStr || err.message || err || "").toLowerCase();
-      return (
-        m.includes("quota") || m.includes("rate limit") || m.includes("rate_limit") ||
-        m.includes("exhausted") || m.includes("resource_exhausted") ||
-        m.includes("resource exhausted") || m.includes("too many requests") ||
-        m.includes("billing") || m.includes("overloaded") || m.includes("capacity") ||
-        m.includes("api key not valid") || m.includes("api_key") ||
-        m.includes("api key") || m.includes("apikey") ||
-        m.includes("permission denied") || m.includes("unauthorized")
-      );
     }
 
     /** True when this key should be skipped and the next chamber key tried */
@@ -1291,19 +1815,20 @@ Rules:
           return await callGeminiOnce(apiKey, model, prompt);
         } catch (e) {
           lastErr = e;
+          const m = (e.message || "").toLowerCase();
           const status = e.status;
-          const m = String(e.message || e || "").toLowerCase();
-          // If the API key is invalid, unauthorized, or revoked (HTTP 401/403), throw immediately to rotate API key in chamber
+          // If the API key itself is invalid, unauthorized, or out of quota, throw immediately to rotate API key in chamber
           if (
-            status === 401 || status === 403 ||
-            m.includes("api key not valid") || m.includes("api_key") ||
-            m.includes("apikey") || m.includes("api key") ||
+            status === 401 || status === 403 || status === 429 ||
+            m.includes("quota") || m.includes("rate limit") || m.includes("rate_limit") ||
+            m.includes("exhausted") || m.includes("api key not valid") ||
+            m.includes("api_key") || m.includes("api key") || m.includes("apikey") ||
             m.includes("permission denied") || m.includes("unauthorized")
           ) {
             throw e;
           }
-          // For model rate limits (429) or any other model error, try the next model in GEMINI_MODELS
-          console.warn("[gemini] model failed due to error (e.g. 429 rate limit), trying next API model:", model, e.message || e);
+          // For ANY other error, try the next API model
+          console.warn("[gemini] model failed due to error, trying next API model:", model, e.message || e);
           continue;
         }
       }
@@ -1320,12 +1845,14 @@ Rules:
         throw err;
       }
 
-      // Try active keys sorted from lowest used today to highest used today
+      // Round-robin: start at chamberIndex, try every active key until one works
       let lastErr = null;
       const n = active.length;
+      const start = ((chamberIndex % n) + n) % n;
 
       for (let i = 0; i < n; i++) {
-        const pick = active[i];
+        const idx = (start + i) % n;
+        const pick = active[idx];
         const label = pick.label || maskKey(pick.key);
 
         if (i > 0) {
@@ -1336,19 +1863,13 @@ Rules:
 
         try {
           const text = await callGemini(pick.key, dateStr, language);
-          // success → update usage today so next generation uses the lowest used API key today
-          const today = getTodayStr();
-          const newTodayCount = getTodayUsage(pick) + 1;
-          pick.lastUsedDate = today;
-          pick.todayCount = newTodayCount;
-          pick.useCount = (pick.useCount || 0) + 1;
-
+          // success → advance past this key for next generate (fair rotation)
+          chamberIndex = (idx + 1) % n;
+          localStorage.setItem("chamberIndex", String(chamberIndex));
           if (pick.id) {
             db.collection("apiKeys").doc(pick.id).update({
               useCount: firebase.firestore.FieldValue.increment(1),
               lastUsedAt: firebase.firestore.FieldValue.serverTimestamp(),
-              lastUsedDate: today,
-              todayCount: newTodayCount,
             }).catch(() => {});
           }
           if (i > 0) toast("Switched API key — generated OK");
@@ -1357,7 +1878,11 @@ Rules:
           lastErr = e;
           console.warn("[chamber] API failed due to error, trying next API:", label, e.message || e);
 
-          // On ANY error, skip this API key and try the next lowest used API key today
+          // Always move index past a failed key so the next request starts on a fresh one
+          chamberIndex = (idx + 1) % n;
+          localStorage.setItem("chamberIndex", String(chamberIndex));
+
+          // On ANY error, skip this API key and try the next API key in the chamber
           if (i < n - 1) {
             continue;
           }
@@ -1580,5 +2105,338 @@ Rules:
       }
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2355c58eec5b29d',t:'MTc4NTQyNDk2Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+
+  <!-- Plasma background (OGL) -->
+  <script type="module">
+  import { Renderer, Program, Mesh, Triangle } from 'https://unpkg.com/ogl@1.0.6/src/index.js';
+
+  const vertex = `#version 300 es
+precision highp float;
+in vec2 position;
+in vec2 uv;
+out vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+  const fragment = `#version 300 es
+precision highp float;
+uniform vec2 iResolution;
+uniform float iTime;
+uniform vec3 uCustomColor;
+uniform float uUseCustomColor;
+uniform float uSpeed;
+uniform float uDirection;
+uniform float uScale;
+uniform float uOpacity;
+uniform vec2 uMouse;
+uniform float uMouseInteractive;
+out vec4 fragColor;
+void mainImage(out vec4 o, vec2 C) {
+  vec2 center = iResolution.xy * 0.5;
+  C = (C - center) / uScale + center;
+  vec2 mouseOffset = (uMouse - center) * 0.0002;
+  C += mouseOffset * length(C - center) * step(0.5, uMouseInteractive);
+  float i, d, z, T = iTime * uSpeed * uDirection;
+  vec3 O, p, S;
+  for (vec2 r = iResolution.xy, Q; ++i < 60.; O += o.w/d*o.xyz) {
+    p = z*normalize(vec3(C-.5*r,r.y));
+    p.z -= 4.;
+    S = p;
+    d = p.y-T;
+    p.x += .4*(1.+p.y)*sin(d + p.x*0.1)*cos(.34*d + p.x*0.05);
+    Q = p.xz *= mat2(cos(p.y+vec4(0,11,33,0)-T));
+    z+= d = abs(sqrt(length(Q*Q)) - .25*(5.+S.y))/3.+8e-4;
+    o = 1.+sin(S.y+p.z*.5+S.z-length(S-p)+vec4(2,1,0,8));
+  }
+  o.xyz = tanh(O/1e4);
+}
+bool finite1(float x){ return !(isnan(x) || isinf(x)); }
+vec3 sanitize(vec3 c){
+  return vec3(
+    finite1(c.r) ? c.r : 0.0,
+    finite1(c.g) ? c.g : 0.0,
+    finite1(c.b) ? c.b : 0.0
+  );
+}
+void main() {
+  vec4 o = vec4(0.0);
+  mainImage(o, gl_FragCoord.xy);
+  vec3 rgb = sanitize(o.rgb);
+  float intensity = (rgb.r + rgb.g + rgb.b) / 3.0;
+  vec3 customColor = intensity * uCustomColor;
+  vec3 finalColor = mix(rgb, customColor, step(0.5, uUseCustomColor));
+  float alpha = length(rgb) * uOpacity;
+  fragColor = vec4(finalColor, alpha);
+}`;
+
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return [1, 0.5, 0.2];
+    return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
+  }
+
+  const containerEl = document.getElementById('plasmaHome');
+  if (!containerEl) { /* skip */ }
+  else {
+    const color = '#7c9cff';
+    const speed = 0.9;
+    const direction = 'forward';
+    const scale = 1.15;
+    const opacity = 0.85;
+    const mouseInteractive = true;
+    const useCustomColor = 1.0;
+    const customColorRgb = hexToRgb(color);
+    const directionMultiplier = direction === 'reverse' ? -1.0 : 1.0;
+
+    let renderer;
+    try {
+      renderer = new Renderer({
+        webgl: 2,
+        alpha: true,
+        antialias: false,
+        dpr: Math.min(window.devicePixelRatio || 1, 2)
+      });
+    } catch (e) {
+      console.warn('[plasma] WebGL init failed', e);
+    }
+
+    if (renderer) {
+      const gl = renderer.gl;
+      const canvas = gl.canvas;
+      canvas.style.display = 'block';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      containerEl.appendChild(canvas);
+
+      const geometry = new Triangle(gl);
+      const program = new Program(gl, {
+        vertex,
+        fragment,
+        uniforms: {
+          iTime: { value: 0 },
+          iResolution: { value: new Float32Array([1, 1]) },
+          uCustomColor: { value: new Float32Array(customColorRgb) },
+          uUseCustomColor: { value: useCustomColor },
+          uSpeed: { value: speed * 0.4 },
+          uDirection: { value: directionMultiplier },
+          uScale: { value: scale },
+          uOpacity: { value: opacity },
+          uMouse: { value: new Float32Array([0, 0]) },
+          uMouseInteractive: { value: mouseInteractive ? 1.0 : 0.0 }
+        }
+      });
+      const mesh = new Mesh(gl, { geometry, program });
+
+      const handleMouseMove = (e) => {
+        if (!mouseInteractive) return;
+        const rect = containerEl.getBoundingClientRect();
+        const mouseUniform = program.uniforms.uMouse.value;
+        mouseUniform[0] = e.clientX - rect.left;
+        mouseUniform[1] = e.clientY - rect.top;
+      };
+      // Track on whole smudge root so interaction feels natural
+      const root = document.getElementById('smudgeRoot') || containerEl;
+      if (mouseInteractive) root.addEventListener('mousemove', handleMouseMove);
+
+      const setSize = () => {
+        const rect = containerEl.getBoundingClientRect();
+        const width = Math.max(1, Math.floor(rect.width));
+        const height = Math.max(1, Math.floor(rect.height));
+        renderer.setSize(width, height);
+        const res = program.uniforms.iResolution.value;
+        res[0] = gl.drawingBufferWidth;
+        res[1] = gl.drawingBufferHeight;
+      };
+      const ro = new ResizeObserver(setSize);
+      ro.observe(containerEl);
+      setSize();
+
+      let raf = 0;
+      let contextLost = false;
+      let isVisible = true;
+      const t0 = performance.now();
+
+      const loop = (t) => {
+        if (contextLost || !isVisible) return;
+        const timeValue = (t - t0) * 0.001;
+        program.uniforms.iTime.value = timeValue;
+        renderer.render({ scene: mesh });
+        raf = requestAnimationFrame(loop);
+      };
+
+      canvas.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+        contextLost = true;
+        cancelAnimationFrame(raf);
+      });
+      canvas.addEventListener('webglcontextrestored', () => {
+        contextLost = false;
+        if (isVisible) {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        }
+      });
+
+      const io = new IntersectionObserver(([entry]) => {
+        const wasVisible = isVisible;
+        isVisible = entry.isIntersecting;
+        if (isVisible && !wasVisible && !contextLost) {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        }
+      }, { threshold: 0 });
+      io.observe(containerEl);
+      raf = requestAnimationFrame(loop);
+    }
+  }
+  </script>
+
+  <!-- Smudge Reveal engine -->
+  <script>
+  (function () {
+    const SMOOTHING = 0.1;
+    const SPEED_THRESHOLD = 0.01;
+    const SIZE_FROM_SPEED = 0.2;
+    const EXPAND_MULT = 2;
+    const EXPAND_MS = 2000;
+    const DISSOLVE_START = 2000;
+    const DISSOLVE_MS = 3000;
+    const TOTAL_LIFE = DISSOLVE_START + DISSOLVE_MS;
+    const LOGIN_AFTER_MOVES = 8;
+
+    function smoothstep(t) {
+      const c = Math.max(0, Math.min(1, t));
+      return c * c * (3 - 2 * c);
+    }
+    function power3in(t) {
+      return t * t * t;
+    }
+
+    const root = document.getElementById("smudgeRoot");
+    const svg = document.getElementById("smudgeSvg");
+    const container = document.getElementById("smudgeBlobs");
+    const loginBtn = document.getElementById("smudgeLoginBtn");
+    const hintEl = document.getElementById("smudgeHint");
+    if (!root || !svg || !container) return;
+
+    const pointer = { x: 0, y: 0 };
+    const smooth = { x: 0, y: 0 };
+    let started = false;
+    let rafId = 0;
+    let moveCount = 0;
+    let loginShown = false;
+    const blobs = [];
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function resize() {
+      svg.style.width = window.innerWidth + "px";
+      svg.style.height = window.innerHeight + "px";
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    function onMove(x, y) {
+      if (!started) {
+        pointer.x = smooth.x = x;
+        pointer.y = smooth.y = y;
+        started = true;
+        return;
+      }
+      pointer.x = x;
+      pointer.y = y;
+    }
+
+    root.addEventListener("mousemove", (e) => onMove(e.pageX, e.pageY));
+    root.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      onMove(e.touches[0].pageX, e.touches[0].pageY);
+    }, { passive: false });
+    root.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      onMove(e.touches[0].pageX, e.touches[0].pageY);
+    }, { passive: false });
+
+    function stampBlob(cx, cy, r) {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("fill", "#fff");
+      container.prepend(circle);
+      blobs.push({ el: circle, cx, cy, baseRadius: r, startTime: performance.now() });
+      moveCount++;
+      if (!loginShown && moveCount >= LOGIN_AFTER_MOVES) {
+        loginShown = true;
+        if (loginBtn) loginBtn.classList.add("visible");
+        if (hintEl) hintEl.style.opacity = "0";
+      }
+    }
+
+    function loop() {
+      const now = performance.now();
+      if (started) {
+        smooth.x += (pointer.x - smooth.x) * SMOOTHING;
+        smooth.y += (pointer.y - smooth.y) * SMOOTHING;
+        const speed = Math.hypot(pointer.x - smooth.x, pointer.y - smooth.y);
+        if (speed > SPEED_THRESHOLD) {
+          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, 8));
+        }
+      }
+      for (let i = blobs.length - 1; i >= 0; i--) {
+        const b = blobs[i];
+        const elapsed = now - b.startTime;
+        if (elapsed > TOTAL_LIFE) {
+          b.el.remove();
+          blobs.splice(i, 1);
+          continue;
+        }
+        let r;
+        if (elapsed < EXPAND_MS) {
+          r = b.baseRadius + b.baseRadius * smoothstep(elapsed / EXPAND_MS);
+        } else {
+          const t2 = (elapsed - DISSOLVE_START) / DISSOLVE_MS;
+          r = b.baseRadius * EXPAND_MULT * (1 - power3in(Math.max(0, Math.min(1, t2))));
+        }
+        b.el.setAttribute("cx", String(b.cx));
+        b.el.setAttribute("cy", String(b.cy));
+        b.el.setAttribute("r", String(Math.max(0, r)));
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+    if (!prefersReduced) rafId = requestAnimationFrame(loop);
+
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => {
+        const overlay = document.getElementById("authOverlay");
+        if (overlay) overlay.classList.remove("hidden");
+      });
+    }
+
+    function syncSmudgeWithAuth(user) {
+      if (user) {
+        root.classList.add("hidden");
+        const overlay = document.getElementById("authOverlay");
+        if (overlay) overlay.classList.add("hidden");
+      } else {
+        root.classList.remove("hidden");
+      }
+    }
+
+    function attachAuthHook() {
+      try {
+        if (typeof firebase !== "undefined" && firebase.auth) {
+          firebase.auth().onAuthStateChanged(syncSmudgeWithAuth);
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+    if (!attachAuthHook()) {
+      const t = setInterval(() => {
+        if (attachAuthHook()) clearInterval(t);
+      }, 200);
+      setTimeout(() => clearInterval(t), 5000);
+    }
+  })();
+  </script>
+
+</body></html>
