@@ -560,7 +560,7 @@
       filter: blur(16px);
       mix-blend-mode: screen;
       background: radial-gradient(circle, rgba(255,255,255,0.12), rgba(135,101,255,0.07) 30%, transparent 70%);
-      transform: translate(-500px, -500px);
+      transform: translate(-100vw, -100vh);
       will-change: transform;
     }
     .spline-content {
@@ -579,14 +579,21 @@
       overflow: visible;
       background: #050506;
     }
+    .spline-scene-area {
+      background:
+        radial-gradient(ellipse 70% 60% at 70% 50%, rgba(120, 90, 255, 0.18), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 30% 80%, rgba(80, 60, 180, 0.12), transparent 50%),
+        #050506;
+    }
     .spline-viewer,
     spline-viewer {
       position: absolute !important;
       inset: 0;
       width: 100% !important;
       height: 100% !important;
-      background: #050506;
-      transform: translateX(15%) scale(1.08);
+      background: transparent;
+      /* no scale-up — saves GPU fill rate */
+      transform: translateX(8%);
       transform-origin: center center;
       border: none;
     }
@@ -1182,12 +1189,8 @@
     <div class="spline-hero" id="splineHero">
       <div class="spline-cursor-light" id="splineCursorLight" aria-hidden="true"></div>
       <div class="spline-content">
-        <div class="spline-scene-area">
-          <spline-viewer
-            id="splineViewer"
-            url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            class="spline-viewer"
-          ></spline-viewer>
+        <div class="spline-scene-area" id="splineSceneArea">
+          <!-- spline-viewer injected only on capable devices -->
           <div class="spline-live-label">
             <span class="spline-live-icon"><span></span></span>
             <div>
@@ -2476,8 +2479,7 @@ Rules:
   </script>
 
 
-  <!-- Spline viewer (no React) -->
-  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+  <!-- Spline loaded only when the device can handle it -->
   <script>
   (function () {
     const home = document.getElementById("splineHome");
@@ -2485,32 +2487,98 @@ Rules:
     const light = document.getElementById("splineCursorLight");
     const loginBtn = document.getElementById("smudgeLoginBtn");
     const lowPerfBtn = document.getElementById("lowPerfBtn");
-    const viewer = document.getElementById("splineViewer");
+    const sceneArea = document.getElementById("splineSceneArea");
     if (!home) return;
 
-    // Soft cursor glow
-    let tx = -500, ty = -500, cx = -500, cy = -500;
+    let viewer = null;
     let raf = 0;
-    function loop() {
-      cx += (tx - cx) * 0.12;
-      cy += (ty - cy) * 0.12;
-      if (light) light.style.transform = "translate(" + (cx - 250) + "px," + (cy - 250) + "px)";
+    let lightOn = false;
+
+    const weak =
+      window.matchMedia("(max-width: 900px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+      (navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || "")));
+
+    function destroyViewer() {
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      lightOn = false;
+      if (viewer) {
+        try { viewer.remove(); } catch (_) {}
+        viewer = null;
+      }
+    }
+
+    function loadSpline() {
+      if (weak || viewer || !sceneArea) return;
+      // Load viewer script on demand
+      const s = document.createElement("script");
+      s.type = "module";
+      s.src = "https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js";
+      s.onload = () => {
+        if (viewer || home.classList.contains("hidden")) return;
+        viewer = document.createElement("spline-viewer");
+        viewer.id = "splineViewer";
+        viewer.className = "spline-viewer";
+        viewer.setAttribute("url", "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode");
+        viewer.setAttribute("loading-anim", "false");
+        viewer.setAttribute("hint", "false");
+        // Insert behind the live label
+        const label = sceneArea.querySelector(".spline-live-label");
+        if (label) sceneArea.insertBefore(viewer, label);
+        else sceneArea.appendChild(viewer);
+      };
+      document.head.appendChild(s);
+    }
+
+    // Desktop / capable: load after first paint so UI feels instant
+    if (!weak) {
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(() => loadSpline(), { timeout: 1200 });
+      } else {
+        setTimeout(loadSpline, 400);
+      }
+    } else {
+      // Phones: no WebGL scene — gradient background only (already in CSS)
+      const label = sceneArea && sceneArea.querySelector(".spline-live-label");
+      if (label) label.style.display = "none";
+    }
+
+    // Cursor glow only on fine pointer, throttled, pauses when tab hidden
+    let tx = -500, ty = -500, cx = -500, cy = -500, last = 0;
+    function loop(t) {
+      if (!lightOn || document.hidden) { raf = 0; return; }
       raf = requestAnimationFrame(loop);
+      if (t - last < 32) return; // ~30fps
+      last = t;
+      cx += (tx - cx) * 0.14;
+      cy += (ty - cy) * 0.14;
+      if (light) light.style.transform = "translate(" + cx + "px," + cy + "px)";
     }
     if (hero && light && !window.matchMedia("(pointer: coarse)").matches) {
+      lightOn = true;
       hero.addEventListener("mousemove", (e) => {
         const b = hero.getBoundingClientRect();
         tx = e.clientX - b.left;
         ty = e.clientY - b.top;
-      });
-      raf = requestAnimationFrame(loop);
+        if (!raf && lightOn && !document.hidden) raf = requestAnimationFrame(loop);
+      }, { passive: true });
     }
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    });
 
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
         try {
           if (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser) {
             home.classList.add("hidden");
+            destroyViewer();
             const panel = document.getElementById("genPanel");
             if (panel) {
               panel.classList.remove("minimized");
@@ -2534,11 +2602,7 @@ Rules:
     function syncHomeWithAuth(user) {
       if (user) {
         home.classList.add("hidden");
-        if (raf) cancelAnimationFrame(raf);
-        // stop heavy 3D when logged in
-        try {
-          if (viewer && viewer.remove) viewer.remove();
-        } catch (_) {}
+        destroyViewer();
         const panel = document.getElementById("genPanel");
         if (panel) {
           panel.classList.remove("minimized");
