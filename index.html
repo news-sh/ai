@@ -524,8 +524,9 @@
     .glass.minimized .panel-head { margin-bottom: 0; }
     .glass.minimized .panel-head .hint { display: none; }
 
-    /* ── Smudge Reveal homescreen ── */
-    .smudge-root {
+
+    /* ── Spline 3D homescreen ── */
+    .spline-home {
       position: fixed;
       inset: 0;
       z-index: 90;
@@ -533,208 +534,244 @@
       height: 100svh;
       height: 100dvh;
       overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      background: #050508;
-      touch-action: none;
+      background: #050506;
+      color: #fff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
     }
-    .smudge-root.hidden { display: none; }
-    .plasma-home {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
+    .spline-home.hidden { display: none; }
+    .spline-hero {
+      position: relative;
+      isolation: isolate;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      pointer-events: none;
+      background: #050506;
     }
-    .plasma-home canvas {
-      display: block;
+    .spline-cursor-light {
+      position: absolute;
+      top: -250px;
+      left: -250px;
+      z-index: 20;
+      width: 500px;
+      height: 500px;
+      pointer-events: none;
+      border-radius: 50%;
+      opacity: 0.65;
+      filter: blur(16px);
+      mix-blend-mode: screen;
+      background: radial-gradient(circle, rgba(255,255,255,0.12), rgba(135,101,255,0.07) 30%, transparent 70%);
+      transform: translate(-500px, -500px);
+      will-change: transform;
+    }
+    .spline-content {
+      position: relative;
       width: 100%;
       height: 100%;
+      overflow: hidden;
+      background: #050506;
     }
-    .smudge-fg,
-    .smudge-bg {
+    .spline-scene-area {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 2.5rem 2rem;
-      font-family: 'Space Grotesk', sans-serif;
-      text-transform: uppercase;
-    }
-    .smudge-fg {
-      background: rgba(5, 5, 8, 0.55);
-      color: #f0ece4;
-      z-index: 1;
-    }
-    .smudge-fg h1 {
-      font-size: clamp(3.2rem, 18vw, 22rem);
-      font-weight: 700;
-      letter-spacing: -0.045em;
-      line-height: 0.85;
-      margin: 0;
-    }
-    .smudge-bg {
-      background: #ede8df;
-      color: #1a1812;
       z-index: 2;
-      align-items: center;
-      mask: url(#kx-smudge-mask);
-      -webkit-mask: url(#kx-smudge-mask);
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      background: #050506;
     }
-    .smudge-bg p {
-      font-size: clamp(1.25rem, 3vw, 3.6rem);
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      line-height: 1.1;
-      max-width: 16ch;
-      text-align: center;
-      margin: 0;
+    .spline-viewer,
+    spline-viewer {
+      position: absolute !important;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      background: #050506;
+      transform: translateX(15%) scale(1.08);
+      transform-origin: center center;
+      border: none;
     }
-    .smudge-svg {
+    .spline-viewer canvas,
+    spline-viewer canvas {
+      width: 100% !important;
+      height: 100% !important;
+      background: #050506 !important;
+    }
+    .spline-text-area {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 3;
-    }
-    .smudge-brand {
-      position: absolute;
-      top: 1.5rem; left: 2rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #f0ece4;
-      mix-blend-mode: difference;
+      top: 0; bottom: 0; left: 0;
       z-index: 10;
+      display: flex;
+      width: min(50%, 640px);
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(30px, 6vh, 70px) clamp(24px, 5vw, 100px);
+      padding-right: 16px;
       pointer-events: none;
-    }
-    .smudge-hint {
-      position: absolute;
-      bottom: 1.5rem; right: 2rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #f0ece4;
-      mix-blend-mode: difference;
-      opacity: 0.5;
-      z-index: 10;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-    .smudge-login {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      z-index: 20;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 14px 36px;
-      border-radius: 999px;
-      border: 2px solid #f0ece4;
       background: transparent;
-      color: #f0ece4;
-      cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease, transform 0.5s ease, background 0.2s, color 0.2s;
-      mix-blend-mode: difference;
     }
-    .smudge-login.visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(-50%) translateY(0);
-    }
-    .smudge-login:hover {
-      background: #f0ece4;
-      color: #0a0a0a;
-      mix-blend-mode: normal;
-    }
-    .smudge-login:active {
-      transform: translateX(-50%) scale(0.97);
-    }
-    .smudge-perf {
-      position: absolute;
-      top: 1.5rem;
-      right: 2rem;
-      z-index: 20;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+    .spline-text-area button { pointer-events: auto; }
+    .spline-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      margin-bottom: clamp(15px, 2.6vh, 25px);
+      padding: 8px 13px;
+      color: rgba(255,255,255,0.65);
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 0.17em;
       text-transform: uppercase;
-      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,0.11);
       border-radius: 999px;
-      border: 1px solid rgba(240,236,228,0.35);
-      background: rgba(0,0,0,0.35);
-      color: #f0ece4;
+      background: rgba(255,255,255,0.035);
+      backdrop-filter: blur(14px);
+    }
+    .spline-eyebrow > span {
+      width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%;
+      background: #a78bfa;
+      box-shadow: 0 0 10px #a78bfa, 0 0 20px rgba(167,139,250,0.7);
+    }
+    .spline-text-area h1 {
+      max-width: 620px;
+      margin: 0;
+      color: #f5f5f7;
+      font-size: clamp(42px, min(7vw, 12vh), 96px);
+      font-weight: 590;
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+    }
+    .spline-gradient-text {
+      display: block;
+      padding-bottom: clamp(5px, 1.2vh, 12px);
+      color: transparent;
+      background: linear-gradient(135deg, #fff, #b8a5ff 48%, #7565ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .spline-text-area > p {
+      max-width: 480px;
+      margin: clamp(14px, 2.5vh, 24px) 0 0;
+      color: rgba(255,255,255,0.5);
+      font-size: clamp(13px, 1.3vw, 16px);
+      line-height: 1.65;
+    }
+    .spline-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: clamp(16px, 3vh, 30px);
+    }
+    .spline-primary, .spline-secondary {
+      height: clamp(44px, 6vh, 52px);
+      padding: 0 20px;
       cursor: pointer;
-      mix-blend-mode: difference;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .smudge-perf:hover {
-      background: rgba(240,236,228,0.15);
-      border-color: #f0ece4;
-    }
-    .smudge-perf.on {
-      background: #f0ece4;
-      color: #0a0a0a;
-      mix-blend-mode: normal;
-    }
-    body.low-perf #appPlasma,
-    body.low-perf .plasma-home,
-    body.low-perf .smudge-svg,
-    body.low-perf .smudge-bg,
-    body.low-perf .kx-runners,
-    body.low-perf .kx-orb,
-    body.low-perf .kx-halo,
-    body.low-perf .kx-noise,
-    body.low-perf .kx-grid,
-    body.low-perf .kx-pointer-glow,
-    body.low-perf .blob,
-    body.low-perf .scene {
-      display: none !important;
-    }
-    body.low-perf .smudge-root,
-    body.low-perf .smudge-fg {
-      background: #0a0a0a;
-    }
-    body.low-perf .header.glass,
-    body.low-perf .gen-panel.glass,
-    body.low-perf .result-panel.glass,
-    body.low-perf .history-panel.glass,
-    body.low-perf .admin-panel.glass {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      background: #12141c !important;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
-    }
-    body.low-perf .kx-page { background: #121018 !important; }
-    body.low-perf .kx-tilt { transform: none !important; transition: none !important; }
-    body.low-perf .kx-card {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-    }
-    body.low-perf * { animation: none !important; }
-    .header-perf-btn {
-      font-size: 0.7rem;
-      padding: 6px 10px;
       border-radius: 999px;
-      white-space: nowrap;
+      font-family: inherit;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .header-perf-btn.on {
-      border-color: var(--accent);
-      color: var(--accent);
+    .spline-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #090909;
+      font-size: 14px;
+      font-weight: 650;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(255,255,255,0.13);
+    }
+    .spline-primary svg {
+      width: 18px; height: 18px; fill: none; stroke: currentColor;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .spline-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(255,255,255,0.19); }
+    .spline-secondary {
+      color: rgba(255,255,255,0.72);
+      font-size: 13px;
+      font-weight: 550;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.035);
+      backdrop-filter: blur(14px);
+    }
+    .spline-secondary:hover {
+      transform: translateY(-2px);
+      color: #fff;
+      border-color: rgba(255,255,255,0.23);
+      background: rgba(255,255,255,0.07);
+    }
+    .spline-features {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-top: clamp(18px, 4vh, 40px);
+    }
+    .spline-features div { display: flex; flex-direction: column; gap: 4px; }
+    .spline-features strong { color: rgba(255,255,255,0.88); font-size: 12px; font-weight: 600; }
+    .spline-features span { color: rgba(255,255,255,0.31); font-size: 11px; }
+    .spline-features i { width: 1px; height: 28px; background: rgba(255,255,255,0.12); }
+    /* hide spline runtime loading UI if injected */
+    spline-viewer::part(logo) { display: none !important; }
+    .spline-scene-area [class*="loader"],
+    .spline-scene-area [class*="Loading"] { display: none !important; }
+    .spline-live-label {
+      position: absolute;
+      right: clamp(14px, 2.5vw, 32px);
+      bottom: max(clamp(16px, 3vh, 32px), env(safe-area-inset-bottom));
+      z-index: 30;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      pointer-events: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      background: rgba(8,8,10,0.72);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+      backdrop-filter: blur(18px);
+    }
+    .spline-live-icon {
+      display: grid; place-items: center; width: 31px; height: 31px; flex-shrink: 0;
+      border: 1px solid rgba(158,130,255,0.2); border-radius: 10px;
+      background: rgba(139,107,255,0.14);
+    }
+    .spline-live-icon span {
+      width: 7px; height: 7px; border-radius: 50%; background: #a78bfa;
+      box-shadow: 0 0 10px #a78bfa, 0 0 20px rgba(167,139,250,0.8);
+    }
+    .spline-live-label strong { color: rgba(255,255,255,0.88); font-size: 11px; font-weight: 600; display: block; }
+    .spline-live-label small { color: rgba(255,255,255,0.38); font-size: 9px; }
+    @media (max-width: 900px) {
+      .spline-home {
+        position: fixed;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        height: 100%;
+      }
+      .spline-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(380px, 1fr);
+        min-height: 100%;
+        overflow: visible;
+      }
+      .spline-text-area {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: max(48px, env(safe-area-inset-top)) 22px 16px;
+      }
+      .spline-scene-area {
+        position: relative;
+        min-height: 380px;
+        height: min(50vh, 480px);
+        overflow: hidden;
+      }
+      .spline-viewer, spline-viewer { transform: none; }
+      .spline-buttons { flex-direction: column; align-items: stretch; }
+      .spline-primary, .spline-secondary { width: 100%; }
+      .spline-features { display: none; }
+      .spline-live-label { right: 14px; bottom: 14px; }
     }
 
     /* ── Kexsio-style auth card ── */
@@ -1140,30 +1177,63 @@
   </style>
 </head>
 <body>
-  <!-- Smudge Reveal homescreen + Plasma -->
-  <section class="smudge-root" id="smudgeRoot" aria-label="Homescreen">
-    <div class="plasma-home" id="plasmaHome" aria-hidden="true"></div>
-    <div class="smudge-brand">news-sh</div>
-    <div class="smudge-hint" id="smudgeHint">Move the cursor · or swipe</div>
-    <div class="smudge-fg">
-      <h1>NEWS-SH</h1>
+  <!-- Spline 3D homescreen -->
+  <section class="spline-home" id="splineHome" aria-label="Homescreen">
+    <div class="spline-hero" id="splineHero">
+      <div class="spline-cursor-light" id="splineCursorLight" aria-hidden="true"></div>
+      <div class="spline-content">
+        <div class="spline-scene-area">
+          <spline-viewer
+            id="splineViewer"
+            url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+            class="spline-viewer"
+          ></spline-viewer>
+          <div class="spline-live-label">
+            <span class="spline-live-icon"><span></span></span>
+            <div>
+              <strong>Live environment</strong>
+              <small>Move your cursor to interact</small>
+            </div>
+          </div>
+        </div>
+        <div class="spline-text-area">
+          <div class="spline-eyebrow">
+            <span></span>
+            news-sh
+          </div>
+          <h1>
+            Get news
+            <span class="spline-gradient-text">instantly.</span>
+          </h1>
+          <p>
+            AI briefings by date and language — India-focused headlines and sports,
+            generated when you need them.
+          </p>
+          <div class="spline-buttons">
+            <button type="button" class="spline-primary" id="smudgeLoginBtn">
+              Log in
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12H19M13 6L19 12L13 18" />
+              </svg>
+            </button>
+            <button type="button" class="spline-secondary" id="lowPerfBtn">
+              Low performance mode
+            </button>
+          </div>
+          <div class="spline-features">
+            <div>
+              <strong>Realtime</strong>
+              <span>3D landing</span>
+            </div>
+            <i></i>
+            <div>
+              <strong>AI news</strong>
+              <span>EN · ML · HI</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="smudge-bg">
-      <p>Let's automate some task</p>
-    </div>
-    <svg class="smudge-svg" id="smudgeSvg" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <filter id="kx-smudge-goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
-          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 60 -14" />
-        </filter>
-      </defs>
-      <mask id="kx-smudge-mask">
-        <g id="smudgeBlobs" filter="url(#kx-smudge-goo)"></g>
-      </mask>
-    </svg>
-    <button type="button" class="smudge-login" id="smudgeLoginBtn">Log in</button>
-    <button type="button" class="smudge-perf" id="lowPerfBtn" title="Disable heavy visual effects">Low performance mode</button>
   </section>
 
   <div class="scene" aria-hidden="true">
@@ -1172,10 +1242,7 @@
     <div class="blob blob-3"></div>
   </div>
 
-  <!-- Plasma behind main app (logged-in) -->
-  <div id="appPlasma" aria-hidden="true"></div>
-
-  <div id="app">
+  <div id="app">  <div id="app">
     <header class="header glass">
       <div class="brand">
         <div class="brand-icon" id="brandIcon"><img src="https://news-sh.github.io/ai/news_files/favicon.png" alt=""></div>
@@ -2408,405 +2475,47 @@ Rules:
     }
   </script>
 
-  <!-- Plasma background (OGL) -->
-  <script type="module">
-  import { Renderer, Program, Mesh, Triangle } from 'https://unpkg.com/ogl@1.0.6/src/index.js';
 
-  const vertex = `#version 300 es
-precision highp float;
-in vec2 position;
-in vec2 uv;
-out vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = vec4(position, 0.0, 1.0);
-}
-`;
-  const fragment = `#version 300 es
-precision highp float;
-uniform vec2 iResolution;
-uniform float iTime;
-uniform vec3 uCustomColor;
-uniform float uUseCustomColor;
-uniform float uSpeed;
-uniform float uDirection;
-uniform float uScale;
-uniform float uOpacity;
-uniform vec2 uMouse;
-uniform float uMouseInteractive;
-out vec4 fragColor;
-void mainImage(out vec4 o, vec2 C) {
-  vec2 center = iResolution.xy * 0.5;
-  C = (C - center) / uScale + center;
-  vec2 mouseOffset = (uMouse - center) * 0.0002;
-  C += mouseOffset * length(C - center) * step(0.5, uMouseInteractive);
-  float i, d, z, T = iTime * uSpeed * uDirection;
-  vec3 O, p, S;
-  for (vec2 r = iResolution.xy, Q; ++i < 60.; O += o.w/d*o.xyz) {
-    p = z*normalize(vec3(C-.5*r,r.y));
-    p.z -= 4.;
-    S = p;
-    d = p.y-T;
-    p.x += .4*(1.+p.y)*sin(d + p.x*0.1)*cos(.34*d + p.x*0.05);
-    Q = p.xz *= mat2(cos(p.y+vec4(0,11,33,0)-T));
-    z+= d = abs(sqrt(length(Q*Q)) - .25*(5.+S.y))/3.+8e-4;
-    o = 1.+sin(S.y+p.z*.5+S.z-length(S-p)+vec4(2,1,0,8));
-  }
-  o.xyz = tanh(O/1e4);
-}
-bool finite1(float x){ return !(isnan(x) || isinf(x)); }
-vec3 sanitize(vec3 c){
-  return vec3(
-    finite1(c.r) ? c.r : 0.0,
-    finite1(c.g) ? c.g : 0.0,
-    finite1(c.b) ? c.b : 0.0
-  );
-}
-void main() {
-  vec4 o = vec4(0.0);
-  mainImage(o, gl_FragCoord.xy);
-  vec3 rgb = sanitize(o.rgb);
-  float intensity = (rgb.r + rgb.g + rgb.b) / 3.0;
-  vec3 customColor = intensity * uCustomColor;
-  vec3 finalColor = mix(rgb, customColor, step(0.5, uUseCustomColor));
-  float alpha = length(rgb) * uOpacity;
-  fragColor = vec4(finalColor, alpha);
-}`;
-
-  function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) return [1, 0.5, 0.2];
-    return [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255];
-  }
-
-  function initPlasma(containerId, opts = {}) {
-    const containerEl = document.getElementById(containerId);
-    if (!containerEl || containerEl.dataset.plasmaInit) return;
-    containerEl.dataset.plasmaInit = '1';
-
-    const color = opts.color || '#9c56ff';
-    const speed = opts.speed ?? 0.85;
-    const scale = opts.scale ?? 1.2;
-    const opacity = opts.opacity ?? 0.75;
-    const mouseInteractive = opts.mouseInteractive !== false;
-    const customColorRgb = hexToRgb(color);
-
-    let renderer;
-    try {
-      renderer = new Renderer({
-        webgl: 2,
-        alpha: true,
-        antialias: false,
-        // Cap DPR hard — biggest FPS win on retina screens
-        dpr: Math.min(window.devicePixelRatio || 1, 1)
-      });
-    } catch (e) {
-      console.warn('[plasma] WebGL init failed', e);
-      return;
-    }
-
-    const gl = renderer.gl;
-    const canvas = gl.canvas;
-    canvas.style.display = 'block';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    containerEl.appendChild(canvas);
-
-    const geometry = new Triangle(gl);
-    const program = new Program(gl, {
-      vertex,
-      fragment,
-      uniforms: {
-        iTime: { value: 0 },
-        iResolution: { value: new Float32Array([1, 1]) },
-        uCustomColor: { value: new Float32Array(customColorRgb) },
-        uUseCustomColor: { value: 1.0 },
-        uSpeed: { value: speed * 0.4 },
-        uDirection: { value: 1.0 },
-        uScale: { value: scale },
-        uOpacity: { value: opacity },
-        uMouse: { value: new Float32Array([0, 0]) },
-        uMouseInteractive: { value: mouseInteractive ? 1.0 : 0.0 }
-      }
-    });
-    const mesh = new Mesh(gl, { geometry, program });
-
-    const handleMouseMove = (e) => {
-      if (!mouseInteractive) return;
-      const rect = containerEl.getBoundingClientRect();
-      const mouseUniform = program.uniforms.uMouse.value;
-      mouseUniform[0] = e.clientX - rect.left;
-      mouseUniform[1] = e.clientY - rect.top;
-    };
-    const moveTarget = opts.moveRoot
-      ? (document.getElementById(opts.moveRoot) || containerEl)
-      : (document.getElementById('smudgeRoot') || document.body);
-    if (mouseInteractive) moveTarget.addEventListener('mousemove', handleMouseMove);
-
-    const setSize = () => {
-      const rect = containerEl.getBoundingClientRect();
-      const width = Math.max(1, Math.floor(rect.width));
-      const height = Math.max(1, Math.floor(rect.height));
-      renderer.setSize(width, height);
-      const res = program.uniforms.iResolution.value;
-      res[0] = gl.drawingBufferWidth;
-      res[1] = gl.drawingBufferHeight;
-    };
-    const ro = new ResizeObserver(setSize);
-    ro.observe(containerEl);
-    setSize();
-
-    let raf = 0;
-    let contextLost = false;
-    let isVisible = true;
-    const t0 = performance.now();
-
-    let pageVisible = !document.hidden;
-    // ~30fps throttle — halves GPU load vs uncapped 60fps
-    let lastFrame = 0;
-    const FRAME_MS = 33;
-
-    const loop = (t) => {
-      raf = requestAnimationFrame(loop);
-      if (contextLost || !isVisible || !pageVisible) return;
-      if (t - lastFrame < FRAME_MS) return;
-      lastFrame = t;
-      program.uniforms.iTime.value = (t - t0) * 0.001;
-      renderer.render({ scene: mesh });
-    };
-
-    canvas.addEventListener('webglcontextlost', (e) => {
-      e.preventDefault();
-      contextLost = true;
-    });
-    canvas.addEventListener('webglcontextrestored', () => {
-      contextLost = false;
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      pageVisible = !document.hidden;
-    });
-
-    const io = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-    }, { threshold: 0 });
-    io.observe(containerEl);
-    raf = requestAnimationFrame(loop);
-
-    // Expose destroy so we can kill plasma after login
-    containerEl.__plasmaStop = () => {
-      cancelAnimationFrame(raf);
-      isVisible = false;
-      try { canvas.remove(); } catch (_) {}
-    };
-  }
-
-  // Only homescreen plasma (app plasma was a major lag source)
-  const isMobile = window.matchMedia('(max-width: 700px)').matches
-    || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!isMobile) {
-    initPlasma('plasmaHome', {
-      color: '#7c9cff',
-      opacity: 0.7,
-      scale: 1.35,
-      mouseInteractive: false,
-      moveRoot: 'smudgeRoot'
-    });
-  }
-  // appPlasma intentionally NOT started — solid dark bg is enough when logged in
-  </script>
-
-  <!-- Smudge Reveal engine -->
+  <!-- Spline viewer (no React) -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
   <script>
   (function () {
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
-      || ("ontouchstart" in window)
-      || navigator.maxTouchPoints > 0;
-    const SMOOTHING = isTouchDevice ? 0.35 : 0.18;
-    const SPEED_THRESHOLD = isTouchDevice ? 0.15 : 0.8;
-    const SIZE_FROM_SPEED = isTouchDevice ? 0.35 : 0.22;
-    // Bigger holes that stay open long enough to read text
-    const EXPAND_MULT = isTouchDevice ? 4 : 3.2;
-    const EXPAND_MS = isTouchDevice ? 1200 : 2800;
-    const DISSOLVE_START = isTouchDevice ? 9000 : 5500; // hold open ~8s on phones
-    const DISSOLVE_MS = isTouchDevice ? 5000 : 4000;
-    const TOTAL_LIFE = DISSOLVE_START + DISSOLVE_MS;
-    const LOGIN_AFTER_MOVES = isTouchDevice ? 2 : 5;
-    const MAX_BLOBS = isTouchDevice ? 12 : 14;
-    const MIN_BLOB_R = isTouchDevice ? 56 : 28;
-
-    function smoothstep(t) {
-      const c = Math.max(0, Math.min(1, t));
-      return c * c * (3 - 2 * c);
-    }
-    function power3in(t) {
-      return t * t * t;
-    }
-
-    const root = document.getElementById("smudgeRoot");
-    const svg = document.getElementById("smudgeSvg");
-    const container = document.getElementById("smudgeBlobs");
+    const home = document.getElementById("splineHome");
+    const hero = document.getElementById("splineHero");
+    const light = document.getElementById("splineCursorLight");
     const loginBtn = document.getElementById("smudgeLoginBtn");
-    const hintEl = document.getElementById("smudgeHint");
-    if (!root || !svg || !container) return;
+    const lowPerfBtn = document.getElementById("lowPerfBtn");
+    const viewer = document.getElementById("splineViewer");
+    if (!home) return;
 
-    const pointer = { x: 0, y: 0 };
-    const smooth = { x: 0, y: 0 };
-    let started = false;
-    let rafId = 0;
-    let moveCount = 0;
-    let loginShown = false;
-    const blobs = [];
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    function resize() {
-      svg.style.width = window.innerWidth + "px";
-      svg.style.height = window.innerHeight + "px";
-    }
-    resize();
-    window.addEventListener("resize", resize);
-
-    function onMove(x, y) {
-      if (!started) {
-        pointer.x = smooth.x = x;
-        pointer.y = smooth.y = y;
-        started = true;
-        return;
-      }
-      pointer.x = x;
-      pointer.y = y;
-    }
-
-    const movesNeeded = LOGIN_AFTER_MOVES;
-    if (hintEl && isTouchDevice) {
-      hintEl.textContent = "Swipe or drag your finger";
-    }
-
-    // Always show Log in after a short delay on phones so users aren't stuck
-    if (isTouchDevice) {
-      setTimeout(() => {
-        if (!loginShown) {
-          loginShown = true;
-          if (loginBtn) loginBtn.classList.add("visible");
-          if (hintEl) hintEl.style.opacity = "0";
-        }
-      }, 2500);
-    }
-
-    root.addEventListener("mousemove", (e) => onMove(e.pageX, e.pageY));
-
-    let lastTouchStamp = 0;
-    function handleTouch(e) {
-      if (!e.touches || !e.touches[0]) return;
-      const x = e.touches[0].pageX;
-      const y = e.touches[0].pageY;
-      onMove(x, y);
-      // Stamp directly on touch — don't rely on velocity (phones felt "broken")
-      const now = performance.now();
-      if (now - lastTouchStamp > 40) {
-        lastTouchStamp = now;
-        stampBlob(x, y, MIN_BLOB_R + Math.random() * 20);
-      }
-    }
-    root.addEventListener("touchstart", handleTouch, { passive: true });
-    root.addEventListener("touchmove", handleTouch, { passive: true });
-
-    function stampBlob(cx, cy, r) {
-      // Cap active circles so SVG filter doesn't explode CPU
-      while (blobs.length >= MAX_BLOBS) {
-        const old = blobs.shift();
-        try { old.el.remove(); } catch (_) {}
-      }
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("fill", "#fff");
-      container.prepend(circle);
-      blobs.push({ el: circle, cx, cy, baseRadius: r, startTime: performance.now() });
-      moveCount++;
-      if (!loginShown && moveCount >= movesNeeded) {
-        loginShown = true;
-        if (loginBtn) loginBtn.classList.add("visible");
-        if (hintEl) hintEl.style.opacity = "0";
-      }
-    }
-
-    function stopSmudgeEngine() {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = 0;
-      while (blobs.length) {
-        const b = blobs.pop();
-        try { b.el.remove(); } catch (_) {}
-      }
-      const plasmaEl = document.getElementById("plasmaHome");
-      if (plasmaEl && plasmaEl.__plasmaStop) plasmaEl.__plasmaStop();
-    }
-
+    // Soft cursor glow
+    let tx = -500, ty = -500, cx = -500, cy = -500;
+    let raf = 0;
     function loop() {
-      const now = performance.now();
-      if (started) {
-        smooth.x += (pointer.x - smooth.x) * SMOOTHING;
-        smooth.y += (pointer.y - smooth.y) * SMOOTHING;
-        const speed = Math.hypot(pointer.x - smooth.x, pointer.y - smooth.y);
-        if (speed > SPEED_THRESHOLD) {
-          stampBlob(smooth.x, smooth.y, Math.max(speed * SIZE_FROM_SPEED, MIN_BLOB_R));
-        }
-      }
-      for (let i = blobs.length - 1; i >= 0; i--) {
-        const b = blobs[i];
-        const elapsed = now - b.startTime;
-        if (elapsed > TOTAL_LIFE) {
-          b.el.remove();
-          blobs.splice(i, 1);
-          continue;
-        }
-        let r;
-        if (elapsed < EXPAND_MS) {
-          // grow from base → base * EXPAND_MULT
-          r = b.baseRadius * (1 + (EXPAND_MULT - 1) * smoothstep(elapsed / EXPAND_MS));
-        } else if (elapsed < DISSOLVE_START) {
-          // hold fully open so text stays readable
-          r = b.baseRadius * EXPAND_MULT;
-        } else {
-          const t2 = (elapsed - DISSOLVE_START) / DISSOLVE_MS;
-          r = b.baseRadius * EXPAND_MULT * (1 - power3in(Math.max(0, Math.min(1, t2))));
-        }
-        b.el.setAttribute("cx", String(b.cx));
-        b.el.setAttribute("cy", String(b.cy));
-        b.el.setAttribute("r", String(Math.max(0, r)));
-      }
-      rafId = requestAnimationFrame(loop);
+      cx += (tx - cx) * 0.12;
+      cy += (ty - cy) * 0.12;
+      if (light) light.style.transform = "translate(" + (cx - 250) + "px," + (cy - 250) + "px)";
+      raf = requestAnimationFrame(loop);
     }
-    if (!prefersReduced) rafId = requestAnimationFrame(loop);
-
-    // ── Low performance mode → lightweight site ──
-    const perfBtn = document.getElementById("lowPerfBtn");
-    if (perfBtn) {
-      perfBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        window.location.href = "https://news-sh.github.io/low";
+    if (hero && light && !window.matchMedia("(pointer: coarse)").matches) {
+      hero.addEventListener("mousemove", (e) => {
+        const b = hero.getBoundingClientRect();
+        tx = e.clientX - b.left;
+        ty = e.clientY - b.top;
       });
-    }
-
-    function focusGeneratePanel() {
-      const panel = document.getElementById("genPanel");
-      if (!panel) return;
-      panel.classList.remove("minimized");
-      const minBtn = panel.querySelector(".min-btn");
-      if (minBtn) {
-        minBtn.textContent = "−";
-        minBtn.title = "Minimize";
-      }
-      setTimeout(() => {
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 80);
+      raf = requestAnimationFrame(loop);
     }
 
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
-        // If already signed in, go to Generate instead of auth
         try {
           if (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser) {
-            root.classList.add("hidden");
-            focusGeneratePanel();
+            home.classList.add("hidden");
+            const panel = document.getElementById("genPanel");
+            if (panel) {
+              panel.classList.remove("minimized");
+              panel.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
             return;
           }
         } catch (_) {}
@@ -2815,40 +2524,46 @@ void main() {
       });
     }
 
-    function syncSmudgeWithAuth(user) {
+    if (lowPerfBtn) {
+      lowPerfBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "https://news-sh.github.io/low";
+      });
+    }
+
+    function syncHomeWithAuth(user) {
       if (user) {
-        root.classList.add("hidden");
-        stopSmudgeEngine();
-        const overlay = document.getElementById("authOverlay");
-        if (overlay) overlay.classList.add("hidden");
-        if (loginBtn) {
-          loginBtn.textContent = "Generate";
-          loginBtn.classList.add("visible");
+        home.classList.add("hidden");
+        if (raf) cancelAnimationFrame(raf);
+        // stop heavy 3D when logged in
+        try {
+          if (viewer && viewer.remove) viewer.remove();
+        } catch (_) {}
+        const panel = document.getElementById("genPanel");
+        if (panel) {
+          panel.classList.remove("minimized");
+          setTimeout(() => panel.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
         }
-        focusGeneratePanel();
       } else {
-        root.classList.remove("hidden");
-        if (loginBtn) loginBtn.textContent = "Log in";
+        home.classList.remove("hidden");
       }
     }
 
-    function attachAuthHook() {
+    function attach() {
       try {
         if (typeof firebase !== "undefined" && firebase.auth) {
-          firebase.auth().onAuthStateChanged(syncSmudgeWithAuth);
+          firebase.auth().onAuthStateChanged(syncHomeWithAuth);
           return true;
         }
       } catch (_) {}
       return false;
     }
-    if (!attachAuthHook()) {
-      const t = setInterval(() => {
-        if (attachAuthHook()) clearInterval(t);
-      }, 200);
-      setTimeout(() => clearInterval(t), 5000);
+    if (!attach()) {
+      const t = setInterval(() => { if (attach()) clearInterval(t); }, 200);
+      setTimeout(() => clearInterval(t), 6000);
     }
-
-    })();
+  })();
   </script>
+
 
 </body></html>
