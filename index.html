@@ -141,6 +141,56 @@
       -webkit-font-smoothing: antialiased;
     }
     body { overflow-y: auto; min-height: 100%; }
+    /* Smooth theme transitions */
+    html {
+      transition: background-color 0.45s ease, color 0.45s ease;
+    }
+    body, .scene, .glass, .glass-strong, .header, .gen-panel, .result-panel,
+    .history-panel, .admin-panel, .btn, .chip, .field input, .field select,
+    .history-item, .key-row, .admin-user, .theme-switcher, .avatar,
+    .result-body, .brand h1, .brand span {
+      transition:
+        background 0.45s ease,
+        background-color 0.45s ease,
+        border-color 0.45s ease,
+        color 0.45s ease,
+        box-shadow 0.45s ease,
+        filter 0.45s ease;
+    }
+    .blob {
+      transition: background 0.55s ease, opacity 0.45s ease;
+    }
+    .theme-btn {
+      transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
+    }
+    .theme-btn.active {
+      transform: scale(1.15);
+    }
+    /* Theme switch flash ring */
+    @keyframes themePulse {
+      0% { box-shadow: 0 0 0 0 var(--accent-soft); }
+      70% { box-shadow: 0 0 0 10px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    html.theme-switching body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background: var(--accent-soft);
+      opacity: 0;
+      animation: themeFlash 0.5s ease forwards;
+    }
+    @keyframes themeFlash {
+      0% { opacity: 0.18; }
+      100% { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html, body, .scene, .glass, .glass-strong, .header, .gen-panel, .result-panel,
+      .history-panel, .admin-panel, .btn, .chip, .field input, .field select,
+      .history-item, .blob, .theme-btn {
+        transition: none !important;
+      }
+      html.theme-switching body::after { animation: none !important; display: none; }
+    }
     .scene {
       position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
       background:
@@ -277,7 +327,7 @@
     body.app-ready #appPlasma { opacity: 1; }
     #appPlasma canvas { display: block; width: 100%; height: 100%; }
     body.app-ready {
-      background: #05030a;
+      background: var(--bg-deep);
     }
     body.app-ready #app {
       position: relative;
@@ -288,19 +338,16 @@
     body.app-ready .result-panel.glass,
     body.app-ready .history-panel.glass,
     body.app-ready .admin-panel.glass {
-      background: linear-gradient(145deg, rgba(18, 13, 23, 0.9), rgba(8, 6, 14, 0.88));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      /* lighter blur when logged in — plasma already costs GPU */
-      backdrop-filter: blur(10px) saturate(120%);
-      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      background: var(--glass-strong);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight);
+      backdrop-filter: blur(12px) saturate(130%);
+      -webkit-backdrop-filter: blur(12px) saturate(130%);
     }
-    /* hide CSS scene blobs when plasma / app is active */
-    body.app-ready .scene { display: none; }
+    /* keep scene soft when app ready (themes need blobs) */
+    body.app-ready .scene { display: block; opacity: 0.55; }
     body.app-ready .gen-panel h2 {
-      background: linear-gradient(180deg, #fff, rgba(255,255,255,0.75));
+      background: linear-gradient(180deg, var(--text), color-mix(in srgb, var(--text) 70%, transparent));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -308,25 +355,34 @@
       letter-spacing: -0.03em;
     }
     body.app-ready .btn-primary {
-      background: #fff;
-      color: #0a080f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
       border-color: transparent;
       font-weight: 650;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+      box-shadow: 0 12px 28px var(--accent-soft);
     }
     body.app-ready .btn-primary:hover:not(:disabled) {
-      background: #f5f2ff;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.35), 0 0 24px rgba(200,160,255,0.2);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      filter: brightness(1.08);
+      box-shadow: 0 16px 36px var(--accent-glow);
     }
     body.app-ready .field input,
     body.app-ready .field select {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.1);
+      background: var(--input-bg);
+      border-color: var(--glass-border);
+      color: var(--text);
     }
     body.app-ready .field input:focus,
     body.app-ready .field select:focus {
-      border-color: rgba(200,150,255,0.45);
-      box-shadow: 0 0 0 3px rgba(180,120,255,0.12);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    /* Ensure primary button text stays readable across themes */
+    html[data-theme="lite"] body.app-ready .btn-primary {
+      color: #fff;
+    }
+    html[data-theme="lite"] body .btn-primary {
+      color: #fff;
     }
     .gen-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
@@ -816,6 +872,7 @@
       mask-image: linear-gradient(to bottom, #000, transparent 84%);
     }
     .kx-noise {
+      display: none; /* was GPU-heavy noise overlay */
       position: absolute; inset: 0; z-index: 10; pointer-events: none; opacity: 0.035;
       mix-blend-mode: soft-light;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -831,14 +888,11 @@
       left: 50%; bottom: -58vh; width: min(1040px, 125vw); height: 92vh;
       transform: translateX(-50%); background: rgba(var(--kx-purple), 0.26); filter: blur(95px);
     }
-    .kx-orb { width: 380px; height: 380px; filter: blur(112px); animation: kx-float 17s ease-in-out infinite; }
+    .kx-orb { width: 280px; height: 280px; filter: blur(60px); animation: none; opacity: 0.7; }
     .kx-orb-left { top: 12%; left: 7%; background: rgba(255,255,255,0.07); }
-    .kx-orb-right { right: 5%; bottom: 8%; background: rgba(204,147,255,0.10); animation-delay: -8s; }
-    @keyframes kx-float {
-      0%, 100% { transform: translate3d(0,0,0) scale(1); }
-      35% { transform: translate3d(48px,-26px,0) scale(1.08); }
-      70% { transform: translate3d(-22px,34px,0) scale(0.96); }
-    }
+    .kx-orb-right { right: 5%; bottom: 8%; background: rgba(204,147,255,0.10); }
+    .kx-halo-top { filter: blur(40px) !important; }
+    .kx-halo-bottom { filter: blur(50px) !important; }
     .kx-stage {
       width: min(100%, 410px);
       perspective: 1500px;
@@ -849,45 +903,27 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .kx-tilt {
-      width: 100%; transform-style: preserve-3d;
-      transition: transform 170ms ease-out; will-change: transform;
+      width: 100%;
+      /* no 3D tilt — major lag source */
+      transform: none !important;
     }
-    .kx-card-shell { position: relative; border-radius: 25px; transform-style: preserve-3d; }
+    .kx-card-shell { position: relative; border-radius: 25px; }
     .kx-shadow {
       position: absolute; inset: 7% 6% -7%; z-index: -2; border-radius: 28px;
-      background: rgba(0,0,0,0.76); filter: blur(36px); transition: filter 450ms ease;
+      background: rgba(0,0,0,0.55); filter: blur(20px);
     }
-    .kx-card-shell:hover .kx-shadow { filter: blur(44px); }
-    .kx-runners {
-      position: absolute; inset: -1px; z-index: 3; overflow: hidden; border-radius: 25px;
-      pointer-events: none; transform: translateZ(24px);
-    }
-    .kx-runner {
-      position: absolute; display: block; border-radius: 999px; opacity: .9;
-      filter: blur(.4px) drop-shadow(0 0 7px #fff) drop-shadow(0 0 16px rgba(212,170,255,.75));
-    }
-    .kx-runner-top, .kx-runner-bottom {
-      width: 43%; height: 2px; background: linear-gradient(90deg, transparent, #fff, transparent);
-    }
-    .kx-runner-right, .kx-runner-left {
-      width: 2px; height: 43%; background: linear-gradient(180deg, transparent, #fff, transparent);
-    }
-    .kx-runner-top { top: 0; left: -48%; animation: kx-top 4s cubic-bezier(.65,0,.35,1) infinite; }
-    .kx-runner-right { top: -48%; right: 0; animation: kx-right 4s 1s cubic-bezier(.65,0,.35,1) infinite; }
-    .kx-runner-bottom { right: -48%; bottom: 0; animation: kx-bottom 4s 2s cubic-bezier(.65,0,.35,1) infinite; }
-    .kx-runner-left { bottom: -48%; left: 0; animation: kx-left 4s 3s cubic-bezier(.65,0,.35,1) infinite; }
-    @keyframes kx-top { 0%,18%{left:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{left:105%;opacity:0} }
-    @keyframes kx-right { 0%,18%{top:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{top:105%;opacity:0} }
-    @keyframes kx-bottom { 0%,18%{right:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{right:105%;opacity:0} }
-    @keyframes kx-left { 0%,18%{bottom:-48%;opacity:0} 27%,66%{opacity:.95} 84%,100%{bottom:105%;opacity:0} }
+    .kx-card-shell:hover .kx-shadow { filter: blur(20px); }
+    /* Runners disabled for performance — static soft border instead */
+    .kx-runners { display: none !important; }
+    .kx-runner { display: none !important; }
     .kx-card {
       position: relative; z-index: 1; overflow: hidden; padding: 28px;
-      border: 1px solid rgba(255,255,255,.075); border-radius: 24px;
-      background: linear-gradient(145deg, rgba(18,13,23,.80), rgba(4,4,6,.64)), rgba(4,3,7,.72);
-      box-shadow: 0 30px 95px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.045), inset 0 -1px 0 rgba(255,255,255,.025);
-      backdrop-filter: blur(24px) saturate(135%);
-      -webkit-backdrop-filter: blur(24px) saturate(135%);
-      transform: translateZ(18px);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 24px;
+      background: rgba(12, 10, 18, 0.92);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+      /* lighter blur for smooth scrolling/typing */
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .kx-card::before {
       position: absolute; inset: 0; z-index: -1; content: ""; pointer-events: none;
@@ -895,11 +931,7 @@
         radial-gradient(circle at 50% 0%, rgba(201,148,255,.11), transparent 40%);
     }
     .kx-pointer-glow {
-      position: absolute; z-index: -1; width: 290px; height: 290px;
-      transform: translate(-50%,-50%); border-radius: 999px; pointer-events: none; opacity: .24;
-      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 68%);
-      filter: blur(24px); transition: left 120ms linear, top 120ms linear;
-      left: 50%; top: 42%;
+      display: none !important;
     }
     .kx-card-pattern {
       position: absolute; inset: 0; z-index: -2; opacity: .045; pointer-events: none;
@@ -918,7 +950,7 @@
     .kx-logo i {
       position: absolute; top: -25%; left: -75%; width: 55%; height: 150%; transform: rotate(22deg);
       background: linear-gradient(90deg, transparent, rgba(255,255,255,.52), transparent);
-      animation: kx-logo-shine 4.8s 1s ease-in-out infinite;
+      animation: none;
     }
     @keyframes kx-logo-shine {
       0%,66%{left:-75%;opacity:0} 73%{opacity:.8} 93%,100%{left:130%;opacity:0}
@@ -1023,7 +1055,7 @@
     .kx-button-sheen {
       position: absolute; top: -50%; left: -45%; width: 34%; height: 200%; transform: rotate(18deg);
       background: linear-gradient(90deg, transparent, rgba(0,0,0,.075), transparent);
-      animation: kx-button-sheen 3.4s ease-in-out infinite;
+      animation: none;
     }
     @keyframes kx-button-sheen {
       0%,54%{left:-45%;opacity:0} 62%{opacity:1} 88%,100%{left:120%;opacity:0}
@@ -1517,24 +1549,37 @@
 
     const $ = (s) => document.querySelector(s);
 
-    // ---------- Themes ----------
-    function applyTheme(name) {
+    // ---------- Themes (smooth + always bound via delegation) ----------
+    function applyTheme(name, animate) {
       const t = name || "default";
-      document.documentElement.setAttribute("data-theme", t);
+      const html = document.documentElement;
+      const prev = html.getAttribute("data-theme");
+      if (animate !== false && prev && prev !== t) {
+        html.classList.remove("theme-switching");
+        void html.offsetWidth; // reflow to restart animation
+        html.classList.add("theme-switching");
+        setTimeout(() => html.classList.remove("theme-switching"), 520);
+      }
+      html.setAttribute("data-theme", t);
       localStorage.setItem("newsTheme", t);
       document.querySelectorAll(".theme-btn").forEach((b) => {
         b.classList.toggle("active", b.dataset.theme === t);
       });
     }
     function bindThemeButtons() {
-      document.querySelectorAll(".theme-btn").forEach((btn) => {
-        btn.onclick = () => applyTheme(btn.dataset.theme);
-      });
+      // no-op kept for call sites; real binding is delegated below
     }
+    // Event delegation so themes work after header re-renders
+    document.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest && e.target.closest(".theme-btn");
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      applyTheme(btn.dataset.theme, true);
+    });
     (function initTheme() {
       const saved = localStorage.getItem("newsTheme") || "default";
-      applyTheme(saved);
-      bindThemeButtons();
+      applyTheme(saved, false);
     })();
 
     // ---------- Minimize panels ----------
@@ -1721,26 +1766,8 @@
       });
     }
 
-    // Card tilt + pointer glow
-    (function bindKxTilt() {
-      const tilt = $("#kxTilt");
-      const glow = $("#kxGlow");
-      if (!tilt) return;
-      tilt.addEventListener("pointermove", (e) => {
-        if (e.pointerType === "touch") return;
-        const b = tilt.getBoundingClientRect();
-        const rx = (e.clientX - b.left) / b.width;
-        const ry = (e.clientY - b.top) / b.height;
-        tilt.style.transform = `rotateX(${(0.5 - ry) * 13}deg) rotateY(${(rx - 0.5) * 13}deg)`;
-        if (glow) { glow.style.left = (rx * 100) + "%"; glow.style.top = (ry * 100) + "%"; }
-      });
-      const reset = () => {
-        tilt.style.transform = "rotateX(0deg) rotateY(0deg)";
-        if (glow) { glow.style.left = "50%"; glow.style.top = "42%"; }
-      };
-      tilt.addEventListener("pointerleave", reset);
-      tilt.addEventListener("pointercancel", reset);
-    })();
+    // Card tilt disabled for performance
+    (function bindKxTilt() { /* no-op */ })();
 
     async function handleAuthSubmit(e) {
       if (e) e.preventDefault();
